@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Galgame乐园 - 恋爱ADV游戏爱好者基地</title>
+<style>
+/* ===== Reset & Variables ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg-deep: #0a0a16;
+  --bg-card: rgba(255,255,255,0.04);
+  --pink: #f472b6;
+  --pink-light: #f9a8d4;
+  --purple: #a78bfa;
+  --purple-deep: #7c3aed;
+  --text: #e2e8f0;
+  --text-dim: #94a3b8;
+  --gold: #fbbf24;
+  --gradient-hero: linear-gradient(135deg, #1a0a2e 0%, #16213e 40%, #0f0f23 100%);
+  --glass: rgba(255,255,255,0.05);
+  --glass-border: rgba(255,255,255,0.08);
+  --radius: 16px;
+  --shadow-card: 0 4px 30px rgba(0,0,0,0.4);
+  --transition: 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: "PingFang SC","Microsoft YaHei","Noto Sans SC",sans-serif;
+  background: var(--bg-deep);
+  color: var(--text);
+  line-height: 1.6;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* ===== Starfield Background ===== */
+.stars {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background: radial-gradient(ellipse at 30% 20%, rgba(244,114,182,0.06) 0%, transparent 60%),
+              radial-gradient(ellipse at 70% 50%, rgba(167,139,250,0.05) 0%, transparent 60%),
+              radial-gradient(ellipse at 50% 80%, rgba(244,114,182,0.04) 0%, transparent 50%);
+}
+
+/* ===== Navigation ===== */
+.nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(10,10,22,0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--glass-border);
+  transition: var(--transition);
+}
+
+.nav-inner {
+  max-width: 1280px; margin: 0 auto;
+  padding: 0 24px; height: 64px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+.logo {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 1.4rem; font-weight: 700;
+  background: linear-gradient(135deg, var(--pink-light), var(--purple));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-decoration: none;
+  letter-spacing: 1px;
+}
+.logo::before {
+  content: "🌸"; font-size: 1.6rem;
+  -webkit-text-fill-color: initial;
+}
+
+.nav-links { display: flex; gap: 32px; list-style: none; }
+.nav-links a {
+  color: var(--text-dim); text-decoration: none;
+  font-size: 0.95rem; position: relative;
+  transition: var(--transition); padding: 4px 0;
+}
+.nav-links a::after {
+  content: ""; position: absolute; bottom: 0; left: 0;
+  width: 0; height: 2px; border-radius: 1px;
+  background: linear-gradient(90deg, var(--pink), var(--purple));
+  transition: width var(--transition);
+}
+.nav-links a:hover { color: var(--text); }
+.nav-links a:hover::after { width: 100%; }
+
+.hamburger { display: none; background: none; border: none; color: var(--text); font-size: 1.6rem; cursor: pointer; }
+
+/* ===== Hero ===== */
+.hero {
+  position: relative; z-index: 1;
+  text-align: center; padding: 100px 24px 80px;
+  background: var(--gradient-hero);
+  overflow: hidden;
+}
+.hero::before {
+  content: ""; position: absolute; inset: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='30' cy='30' r='0.8' fill='rgba(255,255,255,0.06)'/%3E%3C/svg%3E");
+  mask: radial-gradient(ellipse at center, black 30%, transparent 70%);
+  -webkit-mask: radial-gradient(ellipse at center, black 30%, transparent 70%);
+}
+
+.hero-content { position: relative; z-index: 1; max-width: 700px; margin: 0 auto; }
+
+.hero h1 {
+  font-size: 2.8rem; font-weight: 800; letter-spacing: 2px;
+  background: linear-gradient(135deg, var(--pink-light) 0%, var(--purple) 50%, var(--pink) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 16px;
+}
+.hero .subtitle {
+  font-size: 1.15rem; color: var(--text-dim);
+  margin-bottom: 36px; letter-spacing: 1px;
+}
+.hero .btn-group { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 28px; border-radius: 50px;
+  font-size: 0.95rem; font-weight: 600; text-decoration: none;
+  transition: var(--transition); cursor: pointer; border: none;
+  letter-spacing: 0.5px;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--pink), var(--purple-deep));
+  color: #fff; box-shadow: 0 4px 20px rgba(244,114,182,0.35);
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(244,114,182,0.5); }
+.btn-outline {
+  border: 1.5px solid rgba(255,255,255,0.2); color: var(--text);
+  background: rgba(255,255,255,0.04);
+}
+.btn-outline:hover { border-color: var(--pink); background: rgba(244,114,182,0.08); }
+
+.hero-stats {
+  display: flex; justify-content: center; gap: 48px;
+  margin-top: 56px; flex-wrap: wrap;
+}
+.hero-stats .stat { text-align: center; }
+.hero-stats .num {
+  font-size: 2rem; font-weight: 800;
+  background: linear-gradient(135deg, var(--pink), var(--purple));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-stats .label { font-size: 0.85rem; color: var(--text-dim); margin-top: 4px; }
+
+/* ===== Sections ===== */
+.section { position: relative; z-index: 1; max-width: 1280px; margin: 0 auto; padding: 64px 24px; }
+.section-header { text-align: center; margin-bottom: 44px; }
+.section-header h2 {
+  font-size: 1.8rem; font-weight: 700; letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+.section-header p { color: var(--text-dim); font-size: 0.95rem; }
+
+/* ===== Filter Bar ===== */
+.filter-bar {
+  display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;
+  margin-bottom: 36px;
+}
+.filter-tag {
+  padding: 6px 18px; border-radius: 50px;
+  font-size: 0.85rem; cursor: pointer;
+  border: 1px solid var(--glass-border);
+  background: var(--glass); color: var(--text-dim);
+  transition: var(--transition); user-select: none;
+}
+.filter-tag:hover, .filter-tag.active {
+  border-color: var(--pink); color: var(--pink-light);
+  background: rgba(244,114,182,0.1);
+  box-shadow: 0 0 16px rgba(244,114,182,0.15);
+}
+
+/* ===== Game Grid ===== */
+.game-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.game-card {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: var(--transition);
+  cursor: pointer;
+  position: relative;
+}
+.game-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-card), 0 0 40px rgba(244,114,182,0.08);
+  border-color: rgba(244,114,182,0.25);
+}
+
+.card-cover {
+  position: relative; height: 180px; overflow: hidden;
+}
+.card-cover .cover-img {
+  width: 100%; height: 100%; object-fit: cover;
+  transition: transform 0.5s ease;
+}
+.game-card:hover .cover-img { transform: scale(1.06); }
+
+.card-cover .platform-badge {
+  position: absolute; top: 12px; right: 12px;
+  display: flex; gap: 4px;
+}
+.platform-tag {
+  padding: 3px 10px; border-radius: 50px;
+  font-size: 0.7rem; font-weight: 600;
+  background: rgba(0,0,0,0.65); color: #fff;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.card-body { padding: 18px 20px 20px; }
+.card-title {
+  font-size: 1.15rem; font-weight: 700;
+  margin-bottom: 6px;
+  display: flex; align-items: center; gap: 8px;
+}
+.card-title .ver {
+  font-size: 0.75rem; font-weight: 500;
+  padding: 2px 8px; border-radius: 4px;
+  background: rgba(167,139,250,0.2); color: var(--purple);
+}
+.card-genres { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.genre-tag {
+  font-size: 0.72rem; padding: 2px 10px; border-radius: 50px;
+  border: 1px solid rgba(255,255,255,0.12);
+  color: var(--text-dim);
+}
+.card-desc {
+  font-size: 0.85rem; color: var(--text-dim);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.5;
+}
+
+.card-footer {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 20px;
+  border-top: 1px solid var(--glass-border);
+  font-size: 0.8rem; color: var(--text-dim);
+}
+.card-footer .rating {
+  display: flex; align-items: center; gap: 4px;
+  color: var(--gold);
+}
+
+/* ===== Game Detail Modal ===== */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(0,0,0,0.75);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.modal-overlay.show { opacity: 1; pointer-events: auto; }
+
+.modal {
+  background: #14142b;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  max-width: 680px; width: 100%; max-height: 85vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+}
+.modal-close {
+  position: absolute; top: 12px; right: 16px;
+  background: rgba(0,0,0,0.5); color: #fff;
+  border: none; width: 34px; height: 34px; border-radius: 50%;
+  font-size: 1.1rem; cursor: pointer; z-index: 2;
+  transition: var(--transition);
+}
+.modal-close:hover { background: rgba(244,114,182,0.4); }
+
+.modal .modal-cover { width: 100%; height: 260px; object-fit: cover; }
+.modal-body { padding: 24px 28px 28px; }
+.modal-body h3 { font-size: 1.5rem; margin-bottom: 16px; }
+.modal-body .info-row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  margin-bottom: 20px; font-size: 0.9rem;
+}
+.modal-body .info-row span { color: var(--text-dim); }
+.modal-body .info-row strong { color: var(--text); }
+.modal-body .desc-full { color: var(--text-dim); line-height: 1.8; font-size: 0.92rem; }
+
+/* ===== Screenshot Gallery ===== */
+.screenshot-gallery { margin-top: 20px; }
+.screenshot-gallery h4 { font-size: 1rem; margin-bottom: 12px; color: var(--pink-light); }
+.screenshot-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 8px; scroll-behavior: smooth; }
+.screenshot-scroll::-webkit-scrollbar { height: 4px; }
+.screenshot-scroll::-webkit-scrollbar-track { background: rgba(255,255,255,0.04); border-radius: 2px; }
+.screenshot-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 2px; }
+.screenshot-thumb {
+  flex-shrink: 0; width: 200px; height: 120px;
+  border-radius: 8px; object-fit: cover; cursor: pointer;
+  border: 2px solid transparent; transition: var(--transition);
+}
+.screenshot-thumb:hover { border-color: var(--pink); transform: scale(1.03); }
+
+/* ===== Lightbox ===== */
+.lightbox {
+  position: fixed; inset: 0; z-index: 300;
+  background: rgba(0,0,0,0.9);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+}
+.lightbox.show { opacity: 1; pointer-events: auto; }
+.lightbox img { max-width: 92vw; max-height: 92vh; border-radius: 8px; object-fit: contain; }
+.lightbox-close {
+  position: absolute; top: 20px; right: 24px;
+  color: #fff; font-size: 2rem; cursor: pointer;
+  background: none; border: none; opacity: 0.7; transition: var(--transition);
+}
+.lightbox-close:hover { opacity: 1; }
+.lightbox-prev, .lightbox-next {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  color: #fff; font-size: 2.5rem; cursor: pointer;
+  background: rgba(255,255,255,0.08); border: none;
+  width: 48px; height: 48px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  transition: var(--transition); opacity: 0.6;
+}
+.lightbox-prev:hover, .lightbox-next:hover { opacity: 1; background: rgba(255,255,255,0.16); }
+.lightbox-prev { left: 20px; }
+.lightbox-next { right: 20px; }
+
+/* ===== Footer ===== */
+.footer {
+  position: relative; z-index: 1;
+  text-align: center; padding: 40px 24px;
+  border-top: 1px solid var(--glass-border);
+  color: var(--text-dim); font-size: 0.85rem;
+}
+
+/* ===== Animations ===== */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.floating-sakura {
+  position: absolute; pointer-events: none; z-index: 0;
+  animation: float 6s ease-in-out infinite;
+  opacity: 0.13; font-size: 2rem;
+}
+.floating-sakura:nth-child(1) { top: 10%; left: 8%; animation-delay: 0s; }
+.floating-sakura:nth-child(2) { top: 60%; left: 5%; animation-delay: -2s; font-size: 1.5rem; }
+.floating-sakura:nth-child(3) { top: 20%; right: 8%; animation-delay: -3s; }
+.floating-sakura:nth-child(4) { top: 55%; right: 6%; animation-delay: -1s; font-size: 1.3rem; }
+.floating-sakura:nth-child(5) { top: 35%; left: 50%; animation-delay: -4s; font-size: 1.8rem; }
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .nav-links.open {
+    display: flex; flex-direction: column;
+    position: absolute; top: 64px; left: 0; right: 0;
+    background: rgba(10,10,22,0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 20px 24px; gap: 16px;
+    border-bottom: 1px solid var(--glass-border);
+  }
+  .hamburger { display: block; }
+  .hero h1 { font-size: 2rem; }
+  .hero-stats { gap: 28px; }
+  .game-grid { grid-template-columns: 1fr; }
+  .modal-body .info-row { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- Starfield Background -->
+<div class="stars"></div>
+
+<!-- Floating Sakura Decorations -->
+<div class="floating-sakura" style="top:10%;left:8%;">🌸</div>
+<div class="floating-sakura" style="top:60%;left:5%;">🌸</div>
+<div class="floating-sakura" style="top:20%;right:8%;">🌸</div>
+<div class="floating-sakura" style="top:55%;right:6%;">🌸</div>
+<div class="floating-sakura" style="top:35%;left:50%;">🌸</div>
+
+<!-- Navigation -->
+<nav class="nav" id="nav">
+  <div class="nav-inner">
+    <a href="#" class="logo">Galgame乐园</a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#home">首页</a></li>
+      <li><a href="#games">游戏库</a></li>
+      <li><a href="#about">关于</a></li>
+    </ul>
+    <button class="hamburger" id="hamburger" aria-label="菜单">☰</button>
+  </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero" id="home">
+  <div class="floating-sakura" style="top:10%;left:8%;">🌸</div>
+  <div class="floating-sakura" style="top:60%;left:5%;">🌸</div>
+  <div class="floating-sakura" style="top:20%;right:8%;">🌸</div>
+  <div class="floating-sakura" style="top:55%;right:6%;">🌸</div>
+  <div class="floating-sakura" style="top:35%;left:50%;">🌸</div>
+  <div class="hero-content">
+    <h1>Galgame 乐园</h1>
+    <p class="subtitle">恋爱ADV游戏爱好者基地 · 发现你的下一段心动故事</p>
+    <div class="btn-group">
+      <a href="#games" class="btn btn-primary">🎮 浏览游戏库</a>
+      <a href="#about" class="btn btn-outline">📖 了解更多</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><div class="num" id="countGames">5</div><div class="label">收录游戏</div></div>
+      <div class="stat"><div class="num">全平台</div><div class="label">PC / Android / Mac</div></div>
+      <div class="stat"><div class="num">官方中文</div><div class="label">语言支持</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- Game Library -->
+<section class="section" id="games">
+  <div class="section-header">
+    <h2>🎮 游戏库</h2>
+    <p>精选恋爱冒险游戏，持续更新中</p>
+  </div>
+
+  <!-- Filter Tags -->
+  <div class="filter-bar" id="filterBar">
+    <span class="filter-tag active" data-filter="all">全部</span>
+    <span class="filter-tag" data-filter="adv">ADV/视觉小说</span>
+    <span class="filter-tag" data-filter="slg">SLG/模拟</span>
+    <span class="filter-tag" data-filter="pc">PC平台</span>
+    <span class="filter-tag" data-filter="android">Android</span>
+    <span class="filter-tag" data-filter="mac">Mac</span>
+  </div>
+
+  <!-- Game Cards -->
+  <div class="game-grid" id="gameGrid">
+    <!-- Cards injected by JS -->
+  </div>
+</section>
+
+<!-- About Section -->
+<section class="section" id="about" style="text-align:center;">
+  <div class="section-header">
+    <h2>📖 关于本站</h2>
+    <p>本站致力于收录和分享优质恋爱冒险游戏资源<br>为Galgame爱好者提供一个简洁、美观的游戏导航与介绍平台</p>
+  </div>
+  <p style="color:var(--text-dim);max-width:600px;margin:0 auto;line-height:1.8;">
+    本站内容仅供学习交流使用，所有游戏版权归原发行公司所有。<br>
+    如果喜欢某款游戏，请购买正版支持开发者。<br>
+    游戏库将持续更新，敬请收藏关注 🌸
+  </p>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <p>🌸 Galgame乐园 &copy; 2026 — 恋爱ADV游戏爱好者基地</p>
+  <p style="margin-top:6px;font-size:0.78rem;">本站内容仅供学习交流，请支持正版游戏</p>
+</footer>
+
+<!-- Game Detail Modal -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modal">
+    <button class="modal-close" id="modalClose">&times;</button>
+    <div class="modal-cover" id="modalCover"></div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" id="lightboxClose">&times;</button>
+  <button class="lightbox-prev" id="lightboxPrev">&lsaquo;</button>
+  <button class="lightbox-next" id="lightboxNext">&rsaquo;</button>
+  <img src="" alt="截图预览" id="lightboxImg">
+</div>
+
+<script>
+// ===== Game Data (easy to extend) =====
+const games = [
+  {
+    id: "phoenixes",
+    title: "Phoenixes",
+    titleCN: "幻幻",
+    version: "v15",
+    cover: "Phoenixes-v15_Android/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202026-05-29%20211133.png",
+    genres: ["ADV", "视觉小说", "恋爱"],
+    platforms: ["PC", "Android"],
+    rating: "9.2",
+    engine: "Ren'Py",
+    desc: `欧美视觉小说又一力作，多女主多线剧情，CG质量极高，v15内容量爆炸，PC+安卓双端畅玩。`,
+    screenshots: [
+      "Phoenixes-v15_Android/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202026-05-29%20211133.png",
+      "Phoenixes-v15_Android/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202026-05-29%20211138.png",
+      "Phoenixes-v15_Android/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202026-05-29%20211143.png",
+      "Phoenixes-v15_Android/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202026-05-29%20211150.png",
+      "Phoenixes-v15_Android/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202026-05-29%20211156.png"
+    ],
+    downloads: {
+      "PC": "",
+      "Android": "Phoenixes-v15_Android/Phoenixes-v15_Android.apk"
+    },
+    descFull: `<b>Phoenixes（幻幻）是欧美视觉小说阵营中一颗璀璨夺目的明珠。</b>本作以出色的角色塑造、电影化的镜头语言和海量高质量CG，在同类作品中脱颖而出，是Ren'Py引擎的标杆级作品。<br><br>游戏设定在一座充满青春气息的都市校园中，玩家将扮演男主角，与多位性格迥异、魅力十足的女性角色展开一段段浪漫而深刻的故事。每一位女主角都拥有独立的剧情线与专属事件，从傲娇学霸到温柔学姐，从元气少女到神秘转校生，每条路线都经过精心打磨，绝不会让你感到重复或敷衍。<br><br><b style="font-size:1.1em;color:#f9a8d4;">🎯 游戏亮点</b><br><br><b>顶级CG画面</b>——Phoenixes的CG质量在欧美VN圈堪称一流。角色立绘精致细腻，场景渲染氛围感拉满，每一张CG都达到了壁纸级别的水准。无论是日常互动中的俏皮表情，还是关键情节中的深情对视，画面表现力都极为出色。<br><br><b>多女主多线剧情</b>——游戏拥有复数可攻略女主角，每条路线都有完整的起承转合和独特的叙事风格。剧情分支丰富，你的每一个选择都会影响角色好感度与剧情走向，部分隐藏剧情和特殊CG需要特定条件才能解锁。<br><br><b>沉浸式叙事</b>——剧本功底扎实，对话自然流畅，角色性格鲜明立体。故事节奏张弛有度，既有让人会心一笑的日常互动，也有令人揪心的情感冲突。配乐恰到好处地烘托氛围，进一步增强代入感。<br><br><b style="font-size:1.1em;color:#f9a8d4;">📋 版本信息</b><br><br>目前已更新至<b>v15</b>版本，内容量极为丰富，主线剧情时长可达数十小时。PC端与Android端均可畅玩，Android版本为独立APK，安装即玩。<br><br>如果你喜欢制作精良的欧美视觉小说，Phoenixes绝对值得你投入时间细细品味。`
+  },
+  {
+    id: "agent17",
+    title: "特工17",
+    titleCN: "Agent17",
+    version: "v0.26.6",
+    cover: "Agent17-0.26.6/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202026-05-29%20174805.png",
+    genres: ["SLG", "模拟RPG", "谍战"],
+    platforms: ["PC", "Android"],
+    rating: "9.5",
+    engine: "Unity 3D",
+    desc: `都市谍战题材模拟RPG的统治级杰作。顶尖3D建模、全动态CG、数十种结局，沉浸式特工生涯体验，附赠神秘礼包码。`,
+    screenshots: [
+      `Agent17-0.26.6/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202026-05-29%20174805.png`,
+      `Agent17-0.26.6/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202026-05-29%20175121.png`,
+      `Agent17-0.26.6/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202026-05-29%20175134.png`,
+      `Agent17-0.26.6/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202026-05-29%20175140.png`,
+      `Agent17-0.26.6/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202026-05-29%20175145.png`,
+      `Agent17-0.26.6/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202026-05-29%20175151.png`,
+      `Agent17-0.26.6/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202026-05-29%20170034.png`,
+      `Agent17-0.26.6/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202026-05-29%20173744.png`,
+      `Agent17-0.26.6/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202026-05-29%20173752.png`,
+      `Agent17-0.26.6/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202026-05-29%20173759.png`,
+      `Agent17-0.26.6/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202026-05-29%20173809.png`,
+      `Agent17-0.26.6/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202026-05-29%20173814.png`
+    ],
+    downloads: {
+      "PC": "",
+      "Android": "Agent17-0.26.6/Agent17-0.26.6.apk"
+    },
+    descFull: `<b>《特工17》（Agent17）是当今都市谍战题材模拟RPG领域绝对的统治级杰作。</b>它不仅在叙事深度上达到了同类作品难以企及的高度，更在视觉呈现与交互逻辑上展现了工业级的顶尖水准。本作彻底重构了间谍生涯的沉浸感，每一名角色的塑造都拥有极强的生命力与独特的行为逻辑。<br><br>在《特工17》的世界里，玩家将化身为神秘特工17号。你身负秘密任务，穿梭于各种充满危险与诱惑的场景之中。你要面对的不仅有狡猾的敌人，还有各种性格迥异的女性角色。通过与她们的互动，你可以获取关键情报，推进剧情发展，同时也会触发一系列或浪漫、或惊险的故事。游戏剧情环环相扣，充满了反转和惊喜，从繁华都市的街头巷尾，到神秘的地下组织据点，每一个场景都暗藏玄机，就像一场紧张刺激的谍战大片。<br><br><b style=”font-size:1.1em;color:#f9a8d4;”>🎯 游戏亮点</b><br><br><b>惊艳3D画面</b>——游戏采用了顶尖的3D建模技术，人物形象栩栩如生，场景细节丰富逼真。不管是角色的表情动作，还是环境的光影效果，都处理得相当细腻，给玩家带来沉浸式的视觉体验。比如在昏暗的小巷中，灯光打在特工和敌人身上的光影变化，都能让你感受到那种紧张刺激的氛围。<br><br><b>丰富剧情分支</b>——你的每一个选择都将影响剧情走向，与不同女性角色的互动会触发不同的剧情线，多达数十种结局等你探索。是成为冷酷无情的超级特工，还是陷入温柔乡的多情浪子，一切都由你决定。<br><br><b>全动态CG</b>——游戏中的全动态CG绝对是一大亮点，流畅的动画和精彩的剧情结合，让每一个场景都充满了张力。不管是激烈的战斗场面，还是浪漫的情感互动，全动态CG都能将其完美呈现，给你带来顶级的视听享受。<br><br><b>礼包码福利</b>——本次提供的版本包含神秘礼包码，使用后可以解锁各种珍贵道具和隐藏剧情，让你的游戏体验更上一层楼。说不定就能靠礼包码里的道具，轻松化解一场危机，或者开启一段特别的浪漫邂逅！<br><br><b style=”font-size:1.1em;color:#f9a8d4;”>🎮 游戏玩法</b><br><br>玩家通过完成各种任务来推动剧情发展，任务类型丰富多样，有潜入敌方基地窃取情报、保护重要人物、解开各种谜题等。在与女性角色互动时，要注意选择合适的对话选项，不同的选项会影响她们对你的好感度。好感度提升后，不仅能获取更多情报，还能解锁更亲密的互动剧情。同时，玩家还可以利用特工的特殊技能，如<b>潜行、格斗、黑客技术</b>等，应对各种危险情况。比如在潜入敌人基地时，利用潜行技能悄无声息地避开守卫，再用黑客技术破解电脑获取情报。<br><br><b style=”font-size:1.1em;color:#f9a8d4;”>💻 配置需求</b><br><br><b>PC端：</b><br>操作系统：Windows 7/8/10 64位<br>处理器：Intel Core i5 或同等性能处理器<br>内存：8GB RAM<br>显卡：NVIDIA GeForce GTX 960 或 AMD Radeon R9 380<br>存储空间：需要 5GB 可用空间<br><br><b>安卓端：</b><br>系统：Android 7.0 及以上<br>处理器：骁龙660 及以上<br>运行内存：4GB 及以上<br>存储空间：5GB 及以上可用空间<br><br><b style=”font-size:1.1em;color:#f9a8d4;”>📋 最近更新日志</b><br><br>最新版本 Ver 0.24.6 优化了游戏的流畅度，修复了一些场景中偶尔出现的卡顿问题。同时，新增了多个支线剧情，让游戏内容更加丰富。还对部分角色的形象进行了优化，使其更加生动形象。另外，修复了一些与女性角色互动时可能出现的对话错误，让交流更加自然流畅。<br><br><b style=”font-size:1.1em;color:#f9a8d4;”>⭐ 玩家评价</b><br><br>玩家们对《特工17》的评价极高，大家都被其精彩的剧情和精美的3D画面所吸引。丰富的剧情分支和全动态CG更是让玩家们沉浸其中，欲罢不能。不过，也有玩家表示部分任务难度较高，需要花费较多时间和精力去完成。还有玩家希望能增加更多的角色和场景，让游戏世界更加丰富多彩。<br><br><b style=”font-size:1.1em;color:#f9a8d4;”>📖 游戏攻略</b><br><br><b>任务攻略</b>——在执行任务前，仔细观察任务目标和周围环境，利用特工的技能制定合理的计划。比如在潜入任务中，提前标记好敌人的巡逻路线，选择最佳的潜入路径。在保护任务中，要时刻关注被保护对象的安全，提前预判敌人的攻击。<br><br><b>好感度攻略</b>——与女性角色互动时，多选择关心、体贴的对话选项，送她们喜欢的礼物。注意观察她们的兴趣爱好，投其所好。比如某个角色喜欢音乐，就送她一张限量版的唱片，这样能快速提升好感度。<br><br><b>技能升级攻略</b>——根据任务需求合理分配技能点，优先提升常用技能。比如经常执行潜入任务，就先升级潜行和开锁技能；如果战斗较多，就提升格斗和射击技能。同时，完成特定任务可以解锁技能的高级形态，让你的特工更加强大。<br><br><b>礼包码使用攻略</b>——在游戏主界面找到”礼包码兑换”入口，输入提供的礼包码，即可领取丰厚奖励。注意礼包码有时效性，要尽快使用哦。领取奖励后，合理利用道具，比如用隐身道具轻松通过敌人密集的区域。`
+  },
+  {
+    id: "virtues-what-if-7",
+    title: "VIRTUES What-If 7",
+    titleCN: "美德外传-如果7",
+    version: "v2",
+    cover: "VIRTUES_What-If_7_v2/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202026-05-29%20210340.png",
+    genres: ["ADV", "视觉小说", "恋爱"],
+    platforms: ["Android"],
+    rating: "9.0",
+    engine: "Ren'Py",
+    desc: "VIRTUES系列外传作品，延续美德世界观的全新剧情篇章，高质量CG与精良剧本。",
+    screenshots: [
+      "VIRTUES_What-If_7_v2/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202026-05-29%20210340.png",
+      "VIRTUES_What-If_7_v2/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202026-05-29%20210348.png",
+      "VIRTUES_What-If_7_v2/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202026-05-29%20210354.png"
+    ],
+    downloads: {
+      "Android": "VIRTUES_What-If_7_v2/VIRTUES_What-If_7_v2.apk"
+    },
+    descFull: "VIRTUES What-If 7（美德外传-如果7）是VIRTUES系列的外传作品，延续了美德世界观。游戏拥有全新的剧情线，精美的CG画面和一贯的高质量剧本。玩家将在熟悉的VIRTUES宇宙中体验崭新的故事篇章。目前更新至v2版本。"
+  },
+  {
+    id: "eternum",
+    title: "Eternum",
+    titleCN: "永恒世界",
+    version: "0.8.6",
+    cover: "%E6%B0%B8%E6%81%92%E4%B8%96%E7%95%8C%20Eternum%200.8.6/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202026-05-29%20210210.png",
+    genres: ["ADV", "视觉小说", "恋爱", "冒险", "奇幻"],
+    platforms: ["PC"],
+    rating: "9.7",
+    engine: "Ren'Py",
+    desc: "欧美视觉小说天花板级作品，融合奇幻冒险与深刻情感线，顶级渲染与沉浸式叙事。",
+    screenshots: [
+      "%E6%B0%B8%E6%81%92%E4%B8%96%E7%95%8C%20Eternum%200.8.6/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202026-05-29%20210210.png"
+    ],
+    downloads: {},
+    descFull: "Eternum（永恒世界）是欧美视觉小说领域的天花板级作品，由Caribdis团队打造。游戏将奇幻冒险与深刻的情感叙事完美融合，采用Honey Select 2进行角色渲染，画面质量极高。故事设定在未来世界，玩家将探索一个名为Eternum的虚拟现实MMO，在现实与虚拟之间展开一段惊心动魄的冒险。目前更新至0.8.6版本，内容量极为丰富，是必玩的Galgame经典之作。"
+  }
+];
+
+// ===== Render Game Cards =====
+const grid = document.getElementById('gameGrid');
+
+function renderCards(filter = 'all') {
+  grid.innerHTML = '';
+  const filtered = filter === 'all'
+    ? games
+    : games.filter(g => g.genres.some(t => t.toLowerCase().includes(filter)) ||
+                         g.platforms.some(p => p.toLowerCase() === filter));
+
+  filtered.forEach(g => {
+    const card = document.createElement('div');
+    card.className = 'game-card';
+    card.onclick = () => openModal(g);
+    card.innerHTML = `
+      <div class="card-cover">
+        <img class="cover-img" src="${g.cover}" alt="${g.title}" loading="lazy"
+             onerror="this.style.background='linear-gradient(135deg,#2d1b69,#be185d)';this.removeAttribute('src');">
+        <div class="platform-badge">
+          ${g.platforms.map(p => `<span class="platform-tag">${p}</span>`).join('')}
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">
+          ${g.title}
+          <span class="ver">${g.version}</span>
+        </div>
+        <div class="card-genres">
+          ${g.genres.map(t => `<span class="genre-tag">${t}</span>`).join('')}
+        </div>
+        <p class="card-desc">${g.desc}</p>
+      </div>
+      <div class="card-footer">
+        <span>🛠 ${g.engine}</span>
+        <span class="rating">⭐ ${g.rating}</span>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+
+  document.getElementById('countGames').textContent = filtered.length;
+}
+
+// ===== Filter =====
+document.getElementById('filterBar').addEventListener('click', e => {
+  if (!e.target.classList.contains('filter-tag')) return;
+  document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
+  e.target.classList.add('active');
+  renderCards(e.target.dataset.filter);
+});
+
+// ===== Modal =====
+const overlay = document.getElementById('modalOverlay');
+const modalClose = document.getElementById('modalClose');
+
+function openModal(g) {
+  window._screenshots = g.screenshots || [];
+  document.getElementById('modalCover').innerHTML = `<img src="${g.cover}" alt="${g.title}" style="width:100%;height:260px;object-fit:cover;" onerror="this.style.background='linear-gradient(135deg,#2d1b69,#be185d)';this.remove();">`;
+  document.getElementById('modalBody').innerHTML = `
+    <h3>${g.title} <span style="font-size:0.8rem;color:var(--text-dim);">${g.titleCN}</span></h3>
+    <div class="info-row">
+      <div><span>版本</span><br><strong>${g.version}</strong></div>
+      <div><span>引擎</span><br><strong>${g.engine}</strong></div>
+      <div><span>平台</span><br><strong>${g.platforms.join(' / ')}</strong></div>
+      <div><span>评分</span><br><strong style="color:var(--gold);">⭐ ${g.rating}</strong></div>
+    </div>
+    <div style="margin-bottom:16px;">
+      ${g.genres.map(t => `<span class="genre-tag" style="margin-right:6px;">${t}</span>`).join('')}
+    </div>
+    ${g.downloads && Object.keys(g.downloads).some(k => g.downloads[k]) ? `
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;padding:16px;background:rgba(244,114,182,0.06);border-radius:12px;border:1px solid rgba(244,114,182,0.15);">
+      <span style="font-size:0.9rem;color:var(--pink-light);font-weight:600;width:100%;margin-bottom:4px;">🔗 下载链接</span>
+      ${Object.keys(g.downloads).map(p => g.downloads[p] ? `<a href="${g.downloads[p]}" class="btn btn-primary" style="font-size:0.82rem;padding:8px 18px;" download>📥 ${p} 下载</a>` : `<span class="btn btn-outline" style="font-size:0.82rem;padding:8px 18px;cursor:default;opacity:0.5;">${p} 下载 (暂无)</span>`).join('')}
+    </div>
+    ` : ''}
+    <p class="desc-full">${g.descFull}</p>
+    ${g.screenshots && g.screenshots.length ? `
+    <div class="screenshot-gallery">
+      <h4>📸 游戏截图 (${g.screenshots.length}张)</h4>
+      <div class="screenshot-scroll">
+        ${g.screenshots.map((s, i) => `<img class="screenshot-thumb" src="${s}" alt="截图${i+1}" loading="lazy" onclick="event.stopPropagation();currentShotIdx=${i};openLightbox()" onerror="this.style.display='none'">`).join('')}
+      </div>
+    </div>
+    ` : ''}
+  `;
+  overlay.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  overlay.classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+modalClose.addEventListener('click', closeModal);
+overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// ===== Mobile Menu =====
+const hamburger = document.getElementById('hamburger');
+const navLinks = document.getElementById('navLinks');
+hamburger.addEventListener('click', () => navLinks.classList.toggle('open'));
+navLinks.querySelectorAll('a').forEach(a => {
+  a.addEventListener('click', () => navLinks.classList.remove('open'));
+});
+
+// ===== Lightbox =====
+let currentShotIdx = 0;
+const lightbox = document.getElementById('lightbox');
+const lightboxImg = document.getElementById('lightboxImg');
+const lightboxCloseBtn = document.getElementById('lightboxClose');
+const lightboxPrev = document.getElementById('lightboxPrev');
+const lightboxNext = document.getElementById('lightboxNext');
+
+function openLightbox() {
+  const shots = window._screenshots || [];
+  if (!shots.length) return;
+  updateLightboxImg();
+  lightbox.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function updateLightboxImg() {
+  const shots = window._screenshots || [];
+  lightboxImg.src = shots[currentShotIdx] || '';
+  lightboxPrev.style.display = shots.length > 1 ? '' : 'none';
+  lightboxNext.style.display = shots.length > 1 ? '' : 'none';
+}
+
+function closeLightbox() {
+  lightbox.classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+lightboxCloseBtn.addEventListener('click', closeLightbox);
+lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
+document.addEventListener('keydown', e => {
+  if (!lightbox.classList.contains('show')) return;
+  if (e.key === 'Escape') { closeLightbox(); return; }
+  const shots = window._screenshots || [];
+  if (e.key === 'ArrowLeft' && currentShotIdx > 0) { currentShotIdx--; updateLightboxImg(); }
+  if (e.key === 'ArrowRight' && currentShotIdx < shots.length - 1) { currentShotIdx++; updateLightboxImg(); }
+});
+
+lightboxPrev.addEventListener('click', e => {
+  e.stopPropagation();
+  if (currentShotIdx > 0) { currentShotIdx--; updateLightboxImg(); }
+});
+
+lightboxNext.addEventListener('click', e => {
+  e.stopPropagation();
+  const shots = window._screenshots || [];
+  if (currentShotIdx < shots.length - 1) { currentShotIdx++; updateLightboxImg(); }
+});
+
+// ===== Initial Render =====
+renderCards();
+</script>
+</body>
+</html>
