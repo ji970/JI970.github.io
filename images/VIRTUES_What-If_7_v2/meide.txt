@@ -1,0 +1,64 @@
+《美德 What-if_7》是最新一期的外传作品，现已推出汉化版完整资源，同时包含前十部外传的完整合集。本作延续了”美德”系列独特的SLG玩法，通过精心设计的剧情分支和角色互动系统，为玩家带来全新的道德抉择体验。游戏采用高质量的2D画面表现，搭配丰富的动态事件和全程语音(部分版本)，让玩家在每一次选择中感受不同的发展可能。本次发布的合集版本包含最新What-if_7外传及前作完整内容，总大小约600M，适合在安卓和PC双平台上体验。
+版本信息
+《美德 What-if_7》外传合集包含：
+
+这是最新更新的美德外传 what-if_7
+
+另外放入前十部外传合集，共3.2G
+合集列表：
+BonusChapter
+美德外传BonusChapter1_希奥多拉的谎言EP1_V.I.R.T.U.E.S.Theodora’s Lie EP1
+美德外传BonusChapter2_希奥多拉的谎言EP2_V.I.R.T.U.E.S.Theodora’s Lie EP2
+美德外传BonusChapter3_希奥多拉的谎言EP3_V.I.R.T.U.E.S.Theodora’s Lie EP3
+美德外传BonusChapter4_V.I.R.T.U.E.S.TheTrip
+美德外传BonusChapter5_V.I.R.T.U.E.S.FamilyTherapy
+What If
+美德外传WhatIf 1_维拉的狂野愿望_V.I.R.T.U.E.S.WhatIf 1 Vera’s Wild Wish
+美德外传WhatIf 2_惩罚_V.I.R.T.U.E.S.WhatIf 2 The Lesson
+美德外传WhatIf 3_珊尼罗斯传说_V.I.R.T.U.E.S.WhatIf 3 Legend of Shinyrost
+美德外传WhatIf 4_V.I.R.T.U.E.S.WhatIf 4 Lady And The Butler
+美德外传WhatIf 5_V.I.R.T.U.E.S.WhatIf 5 Pornstars
+配置需求
+《美德 What-if_7》外传合集配置要求：
+
+​​PC版最低配置要求：​​
+
+操作系统：Windows 7/8/10 32位或64位
+处理器：Intel Pentium 4 2.0GHz 或 AMD同等性能处理器
+内存：2GB RAM
+显卡：集成显卡(支持DirectX 9.0c)
+DirectX：版本9.0c
+存储空间：需要600MB可用空间
+​​PC版推荐配置要求：​​
+
+操作系统：Windows 10 64位
+处理器：Intel Core i3 或 AMD Ryzen 3
+内存：4GB RAM
+显卡：NVIDIA GeForce GT 630 或 AMD Radeon HD 6570
+DirectX：版本11
+存储空间：需要600MB可用空间(推荐使用SSD)
+​​安卓版配置要求：​​
+
+操作系统：Android 5.0及以上版本
+处理器：1.5GHz双核或更高
+内存：2GB RAM及以上
+存储空间：需要600MB可用空间
+屏幕分辨率：720p及以上
+游戏特色
+《美德 What-if_7》外传合集的主要特色：
+
+​​道德抉择系统​​：关键选择影响剧情走向
+​​角色发展机制​​：培养不同能力属性
+​​丰富剧情内容​​：超过50小时的游玩内容
+​​多结局设定​​：根据选择达成不同结局
+​​动态事件​​：随机事件增加游戏变数
+​​精美2D画面​​：高质量角色立绘
+​​合集体验​​：一次性体验全部外传故事
+​​重要提示：​​
+
+游戏存档不互通，PC与安卓版需分别保存
+首次运行可能需要较长时间解压资源
+部分设备可能需要调整画质设置以获得最佳体验
+游戏内容适合成年玩家，含部分成人主题
+如遇闪退问题，请尝试降低画质设置
+游戏安装完成后，PC版双击桌面快捷方式启动，安卓版在应用列表中找到游戏图标打开。建议在游戏设置中调整适合自己设备的分辨率和画质选项。游戏采用章节式结构，每个选择都将影响后续剧情发展，请谨慎做出决定以体验完整故事线。
