@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Galgame乐园 - 恋爱ADV游戏爱好者基地</title>
+<!-- CDN 预连接，加速图片加载 -->
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
 <style>
 /* ===== Reset & Variables ===== */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -150,6 +153,40 @@ body {
   background-clip: text;
 }
 .hero-stats .label { font-size: 0.85rem; color: var(--text-dim); margin-top: 4px; }
+
+/* ===== View Counter ===== */
+.view-counter {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 0.85rem; color: var(--text-dim);
+  margin-top: 6px;
+}
+.view-counter .view-icon { font-size: 1rem; }
+.view-counter .view-num {
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--pink), var(--purple));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ===== Inline Description Images ===== */
+.desc-img {
+  display: block;
+  max-width: 100%;
+  margin: 16px auto;
+  border-radius: 10px;
+  border: 1px solid var(--glass-border);
+  cursor: pointer;
+  transition: var(--transition);
+}
+.desc-img:hover {
+  border-color: var(--pink);
+  box-shadow: 0 4px 20px rgba(244,114,182,0.2);
+  transform: scale(1.02);
+}
+.desc-img-caption {
+  text-align: center; font-size: 0.78rem;
+  color: var(--text-dim); margin-top: -8px; margin-bottom: 16px;
+}
 
 /* ===== Sections ===== */
 .section { position: relative; z-index: 1; max-width: 1280px; margin: 0 auto; padding: 64px 24px; }
@@ -657,6 +694,7 @@ body {
       <div class="stat"><div class="num" id="countGames">7</div><div class="label">收录游戏</div></div>
       <div class="stat"><div class="num">全平台</div><div class="label">PC / Android / Mac</div></div>
       <div class="stat"><div class="num">官方中文</div><div class="label">语言支持</div></div>
+      <div class="stat"><div class="num" id="countViews">...</div><div class="label">👁 浏览总量</div></div>
     </div>
   </div>
 </section>
@@ -816,6 +854,48 @@ body {
 </div>
 
 <script>
+// ===== CDN Configuration =====
+// 使用 jsDelivr CDN 加速 GitHub 图片加载
+// 本地开发留空，部署到 GitHub 后自动使用 CDN
+const IS_GITHUB = location.hostname.includes('github.io');
+const CDN_BASE = IS_GITHUB
+  ? 'https://cdn.jsdelivr.net/gh/' + location.pathname.split('/').slice(0, 3).join('/') + '@main/'
+  : '';
+
+function cdn(url) {
+  if (!CDN_BASE || !url || url.startsWith('http') || url.startsWith('data:')) return url;
+  return CDN_BASE + url;
+}
+
+// ===== View Counter =====
+function updateViewCount() {
+  const ns = 'galgame-paradise';
+  const key = IS_GITHUB ? location.hostname.replace(/\./g, '-') : 'localhost';
+  const el = document.getElementById('countViews');
+  // 尝试从 countapi 获取，失败则使用 localStorage 兜底
+  fetch('https://api.countapi.xyz/hit/' + ns + '/' + key)
+    .then(r => r.json()).then(d => { el.textContent = d.value.toLocaleString(); })
+    .catch(() => {
+      // 兜底：本地计数
+      let c = parseInt(localStorage.getItem('_gv') || '0');
+      c++; localStorage.setItem('_gv', c);
+      el.textContent = c.toLocaleString();
+    });
+}
+
+// ===== Render description with inline images =====
+function renderDescWithImages(descFull, screenshots) {
+  if (!screenshots || !screenshots.length) return descFull;
+  // 替换 [screenshot:N] 为实际图片
+  return descFull.replace(/\[screenshot:(\d+)\]/g, (match, idx) => {
+    const i = parseInt(idx);
+    if (i >= 0 && i < screenshots.length) {
+      return `<img class="desc-img" src="${cdn(screenshots[i])}" alt="游戏截图${i+1}" loading="lazy" decoding="async" onclick="event.stopPropagation();window._descImgIdx=${i};openLightbox()" onerror="this.style.display='none'"><div class="desc-img-caption">📸 游戏截图 ${i+1}</div>`;
+    }
+    return '';
+  });
+}
+
 // ===== Game Data (easy to extend) =====
 const games = [
   {
@@ -840,7 +920,17 @@ const games = [
       "PC": "https://pan.xunlei.com/s/VOb_z088y_JSrZYyOUHsdDcFA1?pwd=casv",
       "Android": "https://pan.xunlei.com/s/VOb_z088y_JSrZYyOUHsdDcFA1?pwd=casv"
     },
-    descFull: `<b>如果你还没入坑《凤凰 Phoenixes》，现在就是最佳时机。</b>V16版本用126张动态CG+37段高密度剧情，彻底颠覆"视觉小说"的刻板印象。从水墨风转场到角色微表情颤抖，每一帧都在证明：国产团队完全有能力做出比肩《美德》的顶级叙事体验。更狠的是这次更新直接解锁【艾妮妲】核心线——这个让80%玩家意难平的神秘角色，终于揭开她与超能力组织的致命羁绊。<br><br><b style="font-size:1.1em;color:#f9a8d4;">📋 版本更新日志</b><br><br><b>V16：</b><br>♢ 1200+新图与动态场景<br>♢ 艾妮妲加入俱乐部<br>♢ 夕瑟、朱丽安娜、茉莉、索琳、奥索尼娅、艾妮妲将在本次更新中有新场景<br>♢ 索琳&奥索尼娅的新后宫场景<br>♢ bug修复<br><br><b>V15：</b><br>♢ 1200+新图与动态场景<br>♢ 朱丽安娜将成为你的女友<br>♢ 新女孩西奥法诺以及完整故事线<br>♢ 可再次在俱乐部里审讯艾妮妲了<br>♢ 夕瑟、朱丽安娜、索琳、奥梭尼娅、艾妮妲在本次更新中有新场景<br>♢ 夕瑟&艾妮妲、索琳&奥梭尼娅的新后宫场景<br>♢ bug修复<br><br><b>V14：</b><br>♢ 地图UI优化<br>♢ 新增1000+图片与动态场景<br>♢ 索琳完全魅魔化<br>♢ 茉莉可成为女友<br>♢ 新增茉莉的后宫接受度培养<br>♢ 夕瑟、索琳、茉莉、艾妮妲新增剧情<br>♢ 夕瑟&茉莉新增后宫互动场景<br>♢ Bug修复<br><br><b>V13：</b><br>♢ 改进地图UI<br>♢ 900+新图与动态场景<br>♢ 夕瑟和索琳的审讯训练现在有了2阶段<br>♢ 艾妮妲将成为你的女友<br>♢ 夕瑟、索琳、诺维拉、茉莉、艾妮妲、烟将在本次更新中有新剧情<br>♢ 夕瑟&索琳的新后宫场景<br>♢ bug修复<br><br><b>V12：</b><br>♢ 新的地图背景 / 优化地图UI<br>♢ 900+新图片与动态场景<br>♢ 奥梭尼娅将成为您的新女友<br>♢ 奥梭尼娅与索琳将正式进入您的后宫<br>♢ 夕瑟、凯希、奥梭尼娅、索琳的个人线新剧情<br>♢ 众多bug修复<br><br><b>V11：</b><br>♢ 重做了地图系统 / 重做了地点UI<br>♢ 重写女孩们的传记<br>♢ 重做200+表现不佳的老图片<br>♢ 系统性地重写部分文本<br>♢ 实装一个教程系统 / 最大AP值提升到3<br>♢ 为夕瑟、索琳、奥梭尼娅带来了支线剧情线<br>♢ 900+新图片与动态场景<br>♢ 众多bug修复<br><br><b style="font-size:1.1em;color:#f9a8d4;">💻 配置需求</b><br><br><b>安卓端：</b>骁龙730/麒麟810及以上，预留6GB存储空间<br><b>PC端：</b>i3-8100+核显可流畅，4K屏建议GTX1050独显`
+    descFull: `<b>如果你还没入坑《凤凰 Phoenixes》，现在就是最佳时机。</b>V16版本用126张动态CG+37段高密度剧情，彻底颠覆"视觉小说"的刻板印象。从水墨风转场到角色微表情颤抖，每一帧都在证明：国产团队完全有能力做出比肩《美德》的顶级叙事体验。更狠的是这次更新直接解锁【艾妮妲】核心线——这个让80%玩家意难平的神秘角色，终于揭开她与超能力组织的致命羁绊。
+<br><br>[screenshot:0]
+<br><br><b style="font-size:1.1em;color:#f9a8d4;">📋 版本更新日志</b><br><br><b>V16：</b><br>♢ 1200+新图与动态场景<br>♢ 艾妮妲加入俱乐部<br>♢ 夕瑟、朱丽安娜、茉莉、索琳、奥索尼娅、艾妮妲将在本次更新中有新场景<br>♢ 索琳&奥索尼娅的新后宫场景<br>♢ bug修复
+<br><br>[screenshot:1]
+<br><br><b>V15：</b><br>♢ 1200+新图与动态场景<br>♢ 朱丽安娜将成为你的女友<br>♢ 新女孩西奥法诺以及完整故事线<br>♢ 可再次在俱乐部里审讯艾妮妲了<br>♢ 夕瑟、朱丽安娜、索琳、奥梭尼娅、艾妮妲在本次更新中有新场景<br>♢ 夕瑟&艾妮妲、索琳&奥梭尼娅的新后宫场景<br>♢ bug修复<br><br><b>V14：</b><br>♢ 地图UI优化<br>♢ 新增1000+图片与动态场景<br>♢ 索琳完全魅魔化<br>♢ 茉莉可成为女友<br>♢ 新增茉莉的后宫接受度培养<br>♢ 夕瑟、索琳、茉莉、艾妮妲新增剧情<br>♢ 夕瑟&茉莉新增后宫互动场景<br>♢ Bug修复
+<br><br>[screenshot:2]
+<br><br><b>V13：</b><br>♢ 改进地图UI<br>♢ 900+新图与动态场景<br>♢ 夕瑟和索琳的审讯训练现在有了2阶段<br>♢ 艾妮妲将成为你的女友<br>♢ 夕瑟、索琳、诺维拉、茉莉、艾妮妲、烟将在本次更新中有新剧情<br>♢ 夕瑟&索琳的新后宫场景<br>♢ bug修复<br><br><b>V12：</b><br>♢ 新的地图背景 / 优化地图UI<br>♢ 900+新图片与动态场景<br>♢ 奥梭尼娅将成为您的新女友<br>♢ 奥梭尼娅与索琳将正式进入您的后宫<br>♢ 夕瑟、凯希、奥梭尼娅、索琳的个人线新剧情<br>♢ 众多bug修复
+<br><br>[screenshot:3]
+<br><br><b>V11：</b><br>♢ 重做了地图系统 / 重做了地点UI<br>♢ 重写女孩们的传记<br>♢ 重做200+表现不佳的老图片<br>♢ 系统性地重写部分文本<br>♢ 实装一个教程系统 / 最大AP值提升到3<br>♢ 为夕瑟、索琳、奥梭尼娅带来了支线剧情线<br>♢ 900+新图片与动态场景<br>♢ 众多bug修复
+<br><br>[screenshot:4]
+<br><br><b style="font-size:1.1em;color:#f9a8d4;">💻 配置需求</b><br><br><b>安卓端：</b>骁龙730/麒麟810及以上，预留6GB存储空间<br><b>PC端：</b>i3-8100+核显可流畅，4K屏建议GTX1050独显`
   },
   {
     id: "agent17",
@@ -865,7 +955,19 @@ const games = [
       "PC": "https://pan.xunlei.com/s/VOljYe1GSlYzdzhAItEYXmd0A1?pwd=vtz3",
       "Android": "https://pan.xunlei.com/s/VOljYe1GSlYzdzhAItEYXmd0A1?pwd=vtz3"
     },
-    descFull: `<b>《特工17》（Agent17）是当今都市谍战题材模拟RPG领域绝对的统治级杰作。</b>它不仅在叙事深度上达到了同类作品难以企及的高度，更在视觉呈现与交互逻辑上展现了工业级的顶尖水准。本作彻底重构了间谍生涯的沉浸感，每一名角色的塑造都拥有极强的生命力与独特的行为逻辑。<br><br>在《特工 17》的世界里，玩家将化身为神秘特工 17 号。你身负秘密任务，穿梭于各种充满危险与诱惑的场景之中。你要面对的不仅有狡猾的敌人，还有各种性格迥异的女性角色。通过与她们的互动，你可以获取关键情报，推进剧情发展，同时也会触发一系列或浪漫、或惊险的故事。游戏剧情环环相扣，充满了反转和惊喜，从繁华都市的街头巷尾，到神秘的地下组织据点，每一个场景都暗藏玄机，就像一场紧张刺激的谍战大片。<br><br><b style="font-size:1.1em;color:#f9a8d4;">🎯 游戏亮点</b><br><br><b>惊艳3D画面</b>——游戏采用了顶尖的 3D 建模技术，人物形象栩栩如生，场景细节丰富逼真。不管是角色的表情动作，还是环境的光影效果，都处理得相当细腻，给玩家带来沉浸式的视觉体验。比如在昏暗的小巷中，灯光打在特工和敌人身上的光影变化，都能让你感受到那种紧张刺激的氛围。<br><br><b>丰富剧情分支</b>——你的每一个选择都将影响剧情走向，与不同女性角色的互动会触发不同的剧情线，多达数十种结局等你探索。是成为冷酷无情的超级特工，还是陷入温柔乡的多情浪子，一切都由你决定。<br><br><b>全动态CG</b>——游戏中的全动态 CG 绝对是一大亮点，流畅的动画和精彩的剧情结合，让每一个场景都充满了张力。不管是激烈的战斗场面，还是浪漫的情感互动，全动态 CG 都能将其完美呈现，给你带来顶级的视听享受。<br><br><b>礼包码福利</b>——本次提供的版本包含神秘礼包码，使用后可以解锁各种珍贵道具和隐藏剧情，让你的游戏体验更上一层楼。说不定就能靠礼包码里的道具，轻松化解一场危机，或者开启一段特别的浪漫邂逅！<br><br><b style="font-size:1.1em;color:#f9a8d4;">🎮 游戏玩法</b><br><br>玩家通过完成各种任务来推动剧情发展，任务类型丰富多样，有潜入敌方基地窃取情报、保护重要人物、解开各种谜题等。在与女性角色互动时，要注意选择合适的对话选项，不同的选项会影响她们对你的好感度。好感度提升后，不仅能获取更多情报，还能解锁更亲密的互动剧情。同时，玩家还可以利用特工的特殊技能，如<b>潜行、格斗、黑客技术</b>等，应对各种危险情况。比如在潜入敌人基地时，利用潜行技能悄无声息地避开守卫，再用黑客技术破解电脑获取情报。<br><br><b style="font-size:1.1em;color:#f9a8d4;">💻 配置需求</b><br><br><b>PC端：</b><br>操作系统：Windows 7/8/10 64位<br>处理器：Intel Core i5 或同等性能处理器<br>内存：8GB RAM<br>显卡：NVIDIA GeForce GTX 960 或 AMD Radeon R9 380<br>存储空间：需要 5GB 可用空间<br><br><b>安卓端：</b><br>系统：Android 7.0 及以上<br>处理器：骁龙660 及以上<br>运行内存：4GB 及以上<br>存储空间：5GB 及以上可用空间<br><br><b style="font-size:1.1em;color:#f9a8d4;">📋 最近更新日志</b><br><br>最新版本 Ver 0.24.6 优化了游戏的流畅度，修复了一些场景中偶尔出现的卡顿问题。同时，新增了多个支线剧情，让游戏内容更加丰富。还对部分角色的形象进行了优化，使其更加生动形象。另外，修复了一些与女性角色互动时可能出现的对话错误，让交流更加自然流畅。<br><br><b style="font-size:1.1em;color:#f9a8d4;">⭐ 玩家评价</b><br><br>玩家们对《特工 17》的评价极高，大家都被其精彩的剧情和精美的 3D 画面所吸引。丰富的剧情分支和全动态 CG 更是让玩家们沉浸其中，欲罢不能。不过，也有玩家表示部分任务难度较高，需要花费较多时间和精力去完成。还有玩家希望能增加更多的角色和场景，让游戏世界更加丰富多彩。<br><br><b style="font-size:1.1em;color:#f9a8d4;">📖 游戏攻略</b><br><br><b>任务攻略</b>——在执行任务前，仔细观察任务目标和周围环境，利用特工的技能制定合理的计划。比如在潜入任务中，提前标记好敌人的巡逻路线，选择最佳的潜入路径。在保护任务中，要时刻关注被保护对象的安全，提前预判敌人的攻击。<br><br><b>好感度攻略</b>——与女性角色互动时，多选择关心、体贴的对话选项，送她们喜欢的礼物。注意观察她们的兴趣爱好，投其所好。比如某个角色喜欢音乐，就送她一张限量版的唱片，这样能快速提升好感度。<br><br><b>技能升级攻略</b>——根据任务需求合理分配技能点，优先提升常用技能。比如经常执行潜入任务，就先升级潜行和开锁技能；如果战斗较多，就提升格斗和射击技能。同时，完成特定任务可以解锁技能的高级形态，让你的特工更加强大。<br><br><b>礼包码使用攻略</b>——在游戏主界面找到"礼包码兑换"入口，输入提供的礼包码，即可领取丰厚奖励。注意礼包码有时效性，要尽快使用哦。领取奖励后，合理利用道具，比如用隐身道具轻松通过敌人密集的区域。`
+    descFull: `<b>《特工17》（Agent17）是当今都市谍战题材模拟RPG领域绝对的统治级杰作。</b>它不仅在叙事深度上达到了同类作品难以企及的高度，更在视觉呈现与交互逻辑上展现了工业级的顶尖水准。本作彻底重构了间谍生涯的沉浸感，每一名角色的塑造都拥有极强的生命力与独特的行为逻辑。
+<br><br>[screenshot:0]
+<br><br>在《特工 17》的世界里，玩家将化身为神秘特工 17 号。你身负秘密任务，穿梭于各种充满危险与诱惑的场景之中。你要面对的不仅有狡猾的敌人，还有各种性格迥异的女性角色。通过与她们的互动，你可以获取关键情报，推进剧情发展，同时也会触发一系列或浪漫、或惊险的故事。游戏剧情环环相扣，充满了反转和惊喜，从繁华都市的街头巷尾，到神秘的地下组织据点，每一个场景都暗藏玄机，就像一场紧张刺激的谍战大片。
+<br><br>[screenshot:1]
+<br><br><b style="font-size:1.1em;color:#f9a8d4;">🎯 游戏亮点</b><br><br><b>惊艳3D画面</b>——游戏采用了顶尖的 3D 建模技术，人物形象栩栩如生，场景细节丰富逼真。不管是角色的表情动作，还是环境的光影效果，都处理得相当细腻，给玩家带来沉浸式的视觉体验。比如在昏暗的小巷中，灯光打在特工和敌人身上的光影变化，都能让你感受到那种紧张刺激的氛围。<br><br><b>丰富剧情分支</b>——你的每一个选择都将影响剧情走向，与不同女性角色的互动会触发不同的剧情线，多达数十种结局等你探索。是成为冷酷无情的超级特工，还是陷入温柔乡的多情浪子，一切都由你决定。<br><br><b>全动态CG</b>——游戏中的全动态 CG 绝对是一大亮点，流畅的动画和精彩的剧情结合，让每一个场景都充满了张力。不管是激烈的战斗场面，还是浪漫的情感互动，全动态 CG 都能将其完美呈现，给你带来顶级的视听享受。<br><br><b>礼包码福利</b>——本次提供的版本包含神秘礼包码，使用后可以解锁各种珍贵道具和隐藏剧情，让你的游戏体验更上一层楼。说不定就能靠礼包码里的道具，轻松化解一场危机，或者开启一段特别的浪漫邂逅！
+<br><br>[screenshot:2]
+<br><br><b style="font-size:1.1em;color:#f9a8d4;">🎮 游戏玩法</b><br><br>玩家通过完成各种任务来推动剧情发展，任务类型丰富多样，有潜入敌方基地窃取情报、保护重要人物、解开各种谜题等。在与女性角色互动时，要注意选择合适的对话选项，不同的选项会影响她们对你的好感度。好感度提升后，不仅能获取更多情报，还能解锁更亲密的互动剧情。同时，玩家还可以利用特工的特殊技能，如<b>潜行、格斗、黑客技术</b>等，应对各种危险情况。比如在潜入敌人基地时，利用潜行技能悄无声息地避开守卫，再用黑客技术破解电脑获取情报。
+<br><br>[screenshot:3]
+<br><br><b style="font-size:1.1em;color:#f9a8d4;">💻 配置需求</b><br><br><b>PC端：</b><br>操作系统：Windows 7/8/10 64位<br>处理器：Intel Core i5 或同等性能处理器<br>内存：8GB RAM<br>显卡：NVIDIA GeForce GTX 960 或 AMD Radeon R9 380<br>存储空间：需要 5GB 可用空间<br><br><b>安卓端：</b><br>系统：Android 7.0 及以上<br>处理器：骁龙660 及以上<br>运行内存：4GB 及以上<br>存储空间：5GB 及以上可用空间<br><br><b style="font-size:1.1em;color:#f9a8d4;">📋 最近更新日志</b><br><br>最新版本 Ver 0.24.6 优化了游戏的流畅度，修复了一些场景中偶尔出现的卡顿问题。同时，新增了多个支线剧情，让游戏内容更加丰富。还对部分角色的形象进行了优化，使其更加生动形象。另外，修复了一些与女性角色互动时可能出现的对话错误，让交流更加自然流畅。
+<br><br>[screenshot:4]
+<br><br><b style="font-size:1.1em;color:#f9a8d4;">⭐ 玩家评价</b><br><br>玩家们对《特工 17》的评价极高，大家都被其精彩的剧情和精美的 3D 画面所吸引。丰富的剧情分支和全动态 CG 更是让玩家们沉浸其中，欲罢不能。不过，也有玩家表示部分任务难度较高，需要花费较多时间和精力去完成。还有玩家希望能增加更多的角色和场景，让游戏世界更加丰富多彩。
+<br><br>[screenshot:5]
+<br><br><b style="font-size:1.1em;color:#f9a8d4;">📖 游戏攻略</b><br><br><b>任务攻略</b>——在执行任务前，仔细观察任务目标和周围环境，利用特工的技能制定合理的计划。比如在潜入任务中，提前标记好敌人的巡逻路线，选择最佳的潜入路径。在保护任务中，要时刻关注被保护对象的安全，提前预判敌人的攻击。<br><br><b>好感度攻略</b>——与女性角色互动时，多选择关心、体贴的对话选项，送她们喜欢的礼物。注意观察她们的兴趣爱好，投其所好。比如某个角色喜欢音乐，就送她一张限量版的唱片，这样能快速提升好感度。<br><br><b>技能升级攻略</b>——根据任务需求合理分配技能点，优先提升常用技能。比如经常执行潜入任务，就先升级潜行和开锁技能；如果战斗较多，就提升格斗和射击技能。同时，完成特定任务可以解锁技能的高级形态，让你的特工更加强大。<br><br><b>礼包码使用攻略</b>——在游戏主界面找到"礼包码兑换"入口，输入提供的礼包码，即可领取丰厚奖励。注意礼包码有时效性，要尽快使用哦。领取奖励后，合理利用道具，比如用隐身道具轻松通过敌人密集的区域。`
   },
   {
     id: "virtues-what-if-7",
@@ -887,7 +989,13 @@ const games = [
       "PC": "https://pan.baidu.com/s/1luvoDdFN7B4Tv43pq8SoNQ?pwd=9qv2#list/path=%2F",
       "Android": "https://pan.baidu.com/s/1luvoDdFN7B4Tv43pq8SoNQ?pwd=9qv2#list/path=%2F"
     },
-    descFull: `<b>《美德 What-if_7》是最新一期的外传作品，现已推出汉化版完整资源，同时包含前十部外传的完整合集。</b>本作延续了"美德"系列独特的SLG玩法，通过精心设计的剧情分支和角色互动系统，为玩家带来全新的道德抉择体验。游戏采用高质量的2D画面表现，搭配丰富的动态事件和全程语音（部分版本），让玩家在每一次选择中感受不同的发展可能。<br><br><b style="font-size:1.1em;color:#f9a8d4;">📋 版本信息</b><br><br>本次发布的合集版本包含最新What-if_7外传及前作完整内容，总大小约3.2G。<br><br><b>合集列表：</b><br>• BonusChapter — 希奥多拉的谎言 EP1~3 / TheTrip / FamilyTherapy<br>• What If 1 — 维拉的狂野愿望<br>• What If 2 — 惩罚<br>• What If 3 — 珊尼罗斯传说<br>• What If 4 — Lady And The Butler<br>• What If 5 — Pornstars<br>• What If 7 — 最新外传（本作）<br><br><b style="font-size:1.1em;color:#f9a8d4;">💻 配置需求</b><br><br><b>PC版最低配置：</b><br>操作系统：Windows 7/8/10 32位或64位<br>处理器：Intel Pentium 4 2.0GHz<br>内存：2GB RAM<br>显卡：集成显卡（支持DirectX 9.0c）<br>存储空间：需要600MB可用空间<br><br><b>PC版推荐配置：</b><br>操作系统：Windows 10 64位<br>处理器：Intel Core i3 / AMD Ryzen 3<br>内存：4GB RAM<br>显卡：NVIDIA GeForce GT 630 / AMD Radeon HD 6570<br>存储空间：600MB可用空间（推荐SSD）<br><br><b>安卓版配置：</b><br>操作系统：Android 5.0及以上<br>处理器：1.5GHz双核或更高<br>内存：2GB RAM及以上<br>存储空间：600MB可用空间<br><br><b style="font-size:1.1em;color:#f9a8d4;">🎯 游戏特色</b><br><br>• <b>道德抉择系统</b>——关键选择影响剧情走向<br>• <b>角色发展机制</b>——培养不同能力属性<br>• <b>丰富剧情内容</b>——超过50小时的游玩内容<br>• <b>多结局设定</b>——根据选择达成不同结局<br>• <b>动态事件</b>——随机事件增加游戏变数<br>• <b>精美2D画面</b>——高质量角色立绘<br>• <b>合集体验</b>——一次性体验全部外传故事<br><br><b style="font-size:1.1em;color:#f9a8d4;">⚠ 重要提示</b><br><br>游戏存档不互通，PC与安卓版需分别保存。首次运行可能需要较长时间解压资源。部分设备可能需要调整画质设置以获得最佳体验。游戏内容适合成年玩家。如遇闪退问题，请尝试降低画质设置。游戏安装完成后，PC版双击桌面快捷方式启动，安卓版在应用列表中找到游戏图标打开。建议在游戏设置中调整适合自己设备的分辨率和画质选项。每个选择都将影响后续剧情发展，请谨慎做出决定。`
+    descFull: `<b>《美德 What-if_7》是最新一期的外传作品，现已推出汉化版完整资源，同时包含前十部外传的完整合集。</b>本作延续了"美德"系列独特的SLG玩法，通过精心设计的剧情分支和角色互动系统，为玩家带来全新的道德抉择体验。游戏采用高质量的2D画面表现，搭配丰富的动态事件和全程语音（部分版本），让玩家在每一次选择中感受不同的发展可能。
+<br><br>[screenshot:0]
+<br><br><b style="font-size:1.1em;color:#f9a8d4;">📋 版本信息</b><br><br>本次发布的合集版本包含最新What-if_7外传及前作完整内容，总大小约3.2G。<br><br><b>合集列表：</b><br>• BonusChapter — 希奥多拉的谎言 EP1~3 / TheTrip / FamilyTherapy<br>• What If 1 — 维拉的狂野愿望<br>• What If 2 — 惩罚<br>• What If 3 — 珊尼罗斯传说<br>• What If 4 — Lady And The Butler<br>• What If 5 — Pornstars<br>• What If 7 — 最新外传（本作）
+<br><br>[screenshot:1]
+<br><br><b style="font-size:1.1em;color:#f9a8d4;">💻 配置需求</b><br><br><b>PC版最低配置：</b><br>操作系统：Windows 7/8/10 32位或64位<br>处理器：Intel Pentium 4 2.0GHz<br>内存：2GB RAM<br>显卡：集成显卡（支持DirectX 9.0c）<br>存储空间：需要600MB可用空间<br><br><b>PC版推荐配置：</b><br>操作系统：Windows 10 64位<br>处理器：Intel Core i3 / AMD Ryzen 3<br>内存：4GB RAM<br>显卡：NVIDIA GeForce GT 630 / AMD Radeon HD 6570<br>存储空间：600MB可用空间（推荐SSD）<br><br><b>安卓版配置：</b><br>操作系统：Android 5.0及以上<br>处理器：1.5GHz双核或更高<br>内存：2GB RAM及以上<br>存储空间：600MB可用空间
+<br><br>[screenshot:2]
+<br><br><b style="font-size:1.1em;color:#f9a8d4;">🎯 游戏特色</b><br><br>• <b>道德抉择系统</b>——关键选择影响剧情走向<br>• <b>角色发展机制</b>——培养不同能力属性<br>• <b>丰富剧情内容</b>——超过50小时的游玩内容<br>• <b>多结局设定</b>——根据选择达成不同结局<br>• <b>动态事件</b>——随机事件增加游戏变数<br>• <b>精美2D画面</b>——高质量角色立绘<br>• <b>合集体验</b>——一次性体验全部外传故事<br><br><b style="font-size:1.1em;color:#f9a8d4;">⚠ 重要提示</b><br><br>游戏存档不互通，PC与安卓版需分别保存。首次运行可能需要较长时间解压资源。部分设备可能需要调整画质设置以获得最佳体验。游戏内容适合成年玩家。如遇闪退问题，请尝试降低画质设置。游戏安装完成后，PC版双击桌面快捷方式启动，安卓版在应用列表中找到游戏图标打开。建议在游戏设置中调整适合自己设备的分辨率和画质选项。每个选择都将影响后续剧情发展，请谨慎做出决定。`
   },
   {
     id: "eternum",
@@ -907,7 +1015,9 @@ const games = [
       "PC": "https://pan.xunlei.com/s/VOfXdqjEUV71AjZ7oy8vlBhTA1?pwd=j3jy",
       "Android": "https://pan.xunlei.com/s/VOfXdqjEUV71AjZ7oy8vlBhTA1?pwd=j3jy"
     },
-    descFull: `<b>2025年最值得下载的视觉小说神作来了！《永恒世界 Eternum》0.8.6版本正式解锁。</b>这次更新直接封神——38首全新BGM、1650+张超高清渲染、80段丝滑动态动画，直接把沉浸感拉满！作为Caribdis工作室的扛鼎之作，这游戏从剧情到画面都是教科书级别，P站赞助量吊打同类作品，说它是"虚拟世界版《头号玩家》"都算谦虚了。不管你之前有没有玩过，这次更新必须冲，因为这一版连UI都重做了，流畅度直接飙升三档，剧情线更是埋了一堆反转伏笔。<br><br><b style="font-size:1.1em;color:#f9a8d4;">🎯 更新内容暴击</b><br><br><b>视听盛宴全面升级：</b><br>38首原创BGM覆盖科幻、奇幻、悬疑多种风格，戴上耳机瞬间穿越到克雷登市的虚拟世界。80段动态动画丝滑到离谱，角色微表情连睫毛颤动都看得清，尤其是新角色"莉莉丝"的雨中对峙戏，每一帧都能当壁纸。1650张新渲染图+150+环境音效，连NPC路人的脚步声都做了空间环绕处理，细节控狂喜。<br><br><b>剧情高能预警：</b><br>主线新增"记忆碎片"解谜系统，隐藏结局触发条件更烧脑，上版本埋的"AI觉醒"伏笔终于引爆。支线任务量翻倍，关键选择会影响阵营声望，比如帮黑客组织"暗网"还是站队军方"棱镜计划"，选错一步全员BE警告。<br><br><b>性能优化稳如狗：</b><br>16750行代码重构底层逻辑，加载速度比0.7版快60%，十年前的老电脑也能流畅跑。安卓端同步更新，但PC党强烈建议用大屏——4K分辨率下光影粒子效果直接封神，显卡占用率却不到50%。<br><br><b style="font-size:1.1em;color:#f9a8d4;">💻 配置需求（PC版）</b><br><br><b>最低配置：</b>Win10系统 / i5-4460 / 8GB内存 / GTX 960显卡 / 20GB硬盘空间<br><b>推荐配置：</b>Win11系统 / i7-10700K / 16GB内存 / RTX 3060显卡 / 固态硬盘<br><br>安卓端需Android 9.0以上，运存4GB起步，实测千元机也能60帧满血运行。`
+    descFull: `<b>2025年最值得下载的视觉小说神作来了！《永恒世界 Eternum》0.8.6版本正式解锁。</b>这次更新直接封神——38首全新BGM、1650+张超高清渲染、80段丝滑动态动画，直接把沉浸感拉满！作为Caribdis工作室的扛鼎之作，这游戏从剧情到画面都是教科书级别，P站赞助量吊打同类作品，说它是"虚拟世界版《头号玩家》"都算谦虚了。不管你之前有没有玩过，这次更新必须冲，因为这一版连UI都重做了，流畅度直接飙升三档，剧情线更是埋了一堆反转伏笔。
+<br><br>[screenshot:0]
+<br><br><b style="font-size:1.1em;color:#f9a8d4;">🎯 更新内容暴击</b><br><br><b>视听盛宴全面升级：</b><br>38首原创BGM覆盖科幻、奇幻、悬疑多种风格，戴上耳机瞬间穿越到克雷登市的虚拟世界。80段动态动画丝滑到离谱，角色微表情连睫毛颤动都看得清，尤其是新角色"莉莉丝"的雨中对峙戏，每一帧都能当壁纸。1650张新渲染图+150+环境音效，连NPC路人的脚步声都做了空间环绕处理，细节控狂喜。<br><br><b>剧情高能预警：</b><br>主线新增"记忆碎片"解谜系统，隐藏结局触发条件更烧脑，上版本埋的"AI觉醒"伏笔终于引爆。支线任务量翻倍，关键选择会影响阵营声望，比如帮黑客组织"暗网"还是站队军方"棱镜计划"，选错一步全员BE警告。<br><br><b>性能优化稳如狗：</b><br>16750行代码重构底层逻辑，加载速度比0.7版快60%，十年前的老电脑也能流畅跑。安卓端同步更新，但PC党强烈建议用大屏——4K分辨率下光影粒子效果直接封神，显卡占用率却不到50%。<br><br><b style="font-size:1.1em;color:#f9a8d4;">💻 配置需求（PC版）</b><br><br><b>最低配置：</b>Win10系统 / i5-4460 / 8GB内存 / GTX 960显卡 / 20GB硬盘空间<br><b>推荐配置：</b>Win11系统 / i7-10700K / 16GB内存 / RTX 3060显卡 / 固态硬盘<br><br>安卓端需Android 9.0以上，运存4GB起步，实测千元机也能60帧满血运行。`
   },
   {
     id: "above-immortality",
@@ -927,7 +1037,11 @@ const games = [
     downloads: {
       "PC": "https://pan.baidu.com/s/1RC0pftmVy7xXBOwDQeQ42g?pwd=xkme#list/path=%2F"
     },
-    descFull: `<b>九界之上 v0.4.3 是修仙题材NTR向互动SLG中独树一帜的气运掠夺神作。</b>你化身玄门资质平庸的弟子莫生，曾长期遭受天选之子师兄箫天羽的欺凌折辱——而他集绝世天赋、红颜环绕与通天气运于一身，是公认的年轻一代第一人。机缘巧合下你获得可窃取他人"气运"的远古秘宝。你由此展开危险而刺激的复仇计划：步步接近箫天羽身边的女伴，诱导其情感偏移并发生亲密纠葛，同步抽取对方气运壮大自身，直至将这天选之人彻底掏空。全程官方简体中文植入，大量Live2D动态R18演出与多分支路线加持。<br><br><b style="font-size:1.1em;color:#f9a8d4;">🎯 修仙世界观与叙事张力</b><br><br>剧本将古典仙侠的宗门恩怨与NTR情感博弈精妙融合，"气运值"既是核心掠夺数值也左右各女角色对两位男主的倾向判定。角色立绘含丰富面部差分捕捉羞赧、动摇与沉沦的微表情变化，Live2D动态事件演出配合古琴与编钟基调BGM渲染出宗门内外截然不同的氛围。多周目继承气运进度，不同抉择导向守护、黑化或彻底夺妻三种终极结局。<br><br><b style="font-size:1.1em;color:#f9a8d4;">📋 v0.4.3 版本更新</b><br><br>♢ 新增最新章节剧情文本与女角色专属事件链<br>♢ 补全部分早期CG差分<br>♢ 优化Live2D播放帧率稳定性及中文文本溢出修正<br>♢ 增强自动存档容错机制<br><br><b style="font-size:1.1em;color:#f9a8d4;">💻 配置需求</b><br><br><b>最低配置：</b>Windows 7/8.1/10/11（64位）｜i3-2100｜4GB RAM｜DirectX 9.0c显卡｜1.2GB空间<br><b>推荐配置：</b>Windows 10/11（64位）｜i5-4570｜8GB RAM｜GTX 750 Ti+｜SSD推荐`
+    descFull: `<b>九界之上 v0.4.3 是修仙题材NTR向互动SLG中独树一帜的气运掠夺神作。</b>你化身玄门资质平庸的弟子莫生，曾长期遭受天选之子师兄箫天羽的欺凌折辱——而他集绝世天赋、红颜环绕与通天气运于一身，是公认的年轻一代第一人。机缘巧合下你获得可窃取他人"气运"的远古秘宝。你由此展开危险而刺激的复仇计划：步步接近箫天羽身边的女伴，诱导其情感偏移并发生亲密纠葛，同步抽取对方气运壮大自身，直至将这天选之人彻底掏空。全程官方简体中文植入，大量Live2D动态R18演出与多分支路线加持。
+<br><br>[screenshot:0]
+<br><br><b style="font-size:1.1em;color:#f9a8d4;">🎯 修仙世界观与叙事张力</b><br><br>剧本将古典仙侠的宗门恩怨与NTR情感博弈精妙融合，"气运值"既是核心掠夺数值也左右各女角色对两位男主的倾向判定。角色立绘含丰富面部差分捕捉羞赧、动摇与沉沦的微表情变化，Live2D动态事件演出配合古琴与编钟基调BGM渲染出宗门内外截然不同的氛围。多周目继承气运进度，不同抉择导向守护、黑化或彻底夺妻三种终极结局。
+<br><br>[screenshot:1]
+<br><br><b style="font-size:1.1em;color:#f9a8d4;">📋 v0.4.3 版本更新</b><br><br>♢ 新增最新章节剧情文本与女角色专属事件链<br>♢ 补全部分早期CG差分<br>♢ 优化Live2D播放帧率稳定性及中文文本溢出修正<br>♢ 增强自动存档容错机制<br><br><b style="font-size:1.1em;color:#f9a8d4;">💻 配置需求</b><br><br><b>最低配置：</b>Windows 7/8.1/10/11（64位）｜i3-2100｜4GB RAM｜DirectX 9.0c显卡｜1.2GB空间<br><b>推荐配置：</b>Windows 10/11（64位）｜i5-4570｜8GB RAM｜GTX 750 Ti+｜SSD推荐`
   },
   {
     id: "night-bloom",
@@ -951,7 +1065,15 @@ const games = [
       "PC": "https://pan.baidu.com/s/1AhfwvAwvlftQXgL9Cln-RQ?pwd=8ujr#list/path=%2F",
       "Android": "https://pan.baidu.com/s/1AhfwvAwvlftQXgL9Cln-RQ?pwd=8ujr#list/path=%2F"
     },
-    descFull: `<b>夜幕之花 夜之绽放 Night Bloom v0.657 是日系RPG Maker MV引擎下NTR叙事类作品的顶尖代表。</b>你扮演边境村庄平凡青年莱恩，青梅竹马的未婚妻艾莉丝被选为年度祭品送往王都神殿——你追随其后潜入奢靡权贵圈层，却发现所谓的神眷仪式暗藏肮脏交易。游戏采用经典ATB半即时遇敌战斗结合多分支对话树，艾莉丝在王都的遭遇随你的介入程度与情报搜集量产生截然不同的偏移轨迹。官方简体中文全文本植入，无修正版完整收录所有亲密事件差分，附赠全进度通关存档，PC与安卓双端完美兼容。<br><br><b style="font-size:1.1em;color:#f9a8d4;">🎯 叙事张力与美术演出</b><br><br>剧本以双时间轴呈现——莱恩在王都暗巷调查线索、贿赂守卫、偷窥神殿密室，艾莉丝则在独立日记中记录心境从虔诚到动摇的全过程。立绘由知名原画师绘制，艾莉丝含祭司袍、常服及礼服三套换装差分，面部微表情随堕落倾向阶梯式演变。BGM从乡村民谣无缝切换至圣堂管风琴再转入暧昧低音，氛围渲染极具电影质感。<br><br><b style="font-size:1.1em;color:#f9a8d4;">📋 v0.657 版本更新</b><br><br>♢ 追加最新章节调查事件与新CG差分<br>♢ 补全部分支线任务文本<br>♢ 优化安卓端虚拟按键布局与字体渲染清晰度<br>♢ 修复特定存档读取时报错问题<br>♢ 打包内含完美通关存档可直接体验全分支<br><br><b style="font-size:1.1em;color:#f9a8d4;">💻 配置需求</b><br><br><b>PC最低：</b>Windows 7+（32/64位）｜Atom Z3700｜2GB RAM｜512MB显存｜2GB空间<br><b>Android最低：</b>Android 6.0｜骁龙625｜2GB RAM<br><b>推荐：</b>Win 10/11｜i3或同级｜4GB RAM｜1280×720+｜SSD推荐`
+    descFull: `<b>夜幕之花 夜之绽放 Night Bloom v0.657 是日系RPG Maker MV引擎下NTR叙事类作品的顶尖代表。</b>你扮演边境村庄平凡青年莱恩，青梅竹马的未婚妻艾莉丝被选为年度祭品送往王都神殿——你追随其后潜入奢靡权贵圈层，却发现所谓的神眷仪式暗藏肮脏交易。游戏采用经典ATB半即时遇敌战斗结合多分支对话树，艾莉丝在王都的遭遇随你的介入程度与情报搜集量产生截然不同的偏移轨迹。官方简体中文全文本植入，无修正版完整收录所有亲密事件差分，附赠全进度通关存档，PC与安卓双端完美兼容。
+<br><br>[screenshot:0]
+<br><br><b style="font-size:1.1em;color:#f9a8d4;">🎯 叙事张力与美术演出</b><br><br>剧本以双时间轴呈现——莱恩在王都暗巷调查线索、贿赂守卫、偷窥神殿密室，艾莉丝则在独立日记中记录心境从虔诚到动摇的全过程。立绘由知名原画师绘制，艾莉丝含祭司袍、常服及礼服三套换装差分，面部微表情随堕落倾向阶梯式演变。BGM从乡村民谣无缝切换至圣堂管风琴再转入暧昧低音，氛围渲染极具电影质感。
+<br><br>[screenshot:1]
+<br><br>[screenshot:2]
+<br><br><b style="font-size:1.1em;color:#f9a8d4;">📋 v0.657 版本更新</b><br><br>♢ 追加最新章节调查事件与新CG差分<br>♢ 补全部分支线任务文本<br>♢ 优化安卓端虚拟按键布局与字体渲染清晰度<br>♢ 修复特定存档读取时报错问题<br>♢ 打包内含完美通关存档可直接体验全分支
+<br><br>[screenshot:3]
+<br><br>[screenshot:4]
+<br><br><b style="font-size:1.1em;color:#f9a8d4;">💻 配置需求</b><br><br><b>PC最低：</b>Windows 7+（32/64位）｜Atom Z3700｜2GB RAM｜512MB显存｜2GB空间<br><b>Android最低：</b>Android 6.0｜骁龙625｜2GB RAM<br><b>推荐：</b>Win 10/11｜i3或同级｜4GB RAM｜1280×720+｜SSD推荐`
   }
 ];
 
@@ -991,7 +1113,7 @@ function renderCards() {
       card.onclick = () => openModal(g);
       card.innerHTML = `
         <div class="card-cover">
-          <img class="cover-img" src="${g.cover}" alt="${g.title}" loading="lazy"
+          <img class="cover-img" src="${cdn(g.cover)}" alt="${g.title}" loading="lazy" decoding="async"
                onerror="this.style.background='linear-gradient(135deg,#2d1b69,#be185d)';this.removeAttribute('src');">
           <div class="platform-badge">
             ${g.platforms.map(p => `<span class="platform-tag">${p}</span>`).join('')}
@@ -1040,7 +1162,8 @@ const modalClose = document.getElementById('modalClose');
 
 function openModal(g) {
   window._screenshots = g.screenshots || [];
-  document.getElementById('modalCover').innerHTML = `<img src="${g.cover}" alt="${g.title}" style="width:100%;height:260px;object-fit:cover;" onerror="this.style.background='linear-gradient(135deg,#2d1b69,#be185d)';this.remove();">`;
+  const coverUrl = cdn(g.cover);
+  document.getElementById('modalCover').innerHTML = `<img src="${coverUrl}" alt="${g.title}" style="width:100%;height:260px;object-fit:cover;" loading="lazy" decoding="async" onerror="this.style.background='linear-gradient(135deg,#2d1b69,#be185d)';this.remove();">`;
   document.getElementById('modalBody').innerHTML = `
     <h3>${g.title} <span style="font-size:0.8rem;color:var(--text-dim);">${g.titleCN}</span></h3>
     <div class="info-row">
@@ -1058,12 +1181,12 @@ function openModal(g) {
       ${Object.keys(g.downloads).map(p => g.downloads[p] ? `<a href="${g.downloads[p]}" class="btn btn-primary" style="font-size:0.82rem;padding:8px 18px;" download>📥 ${p} 下载</a>` : `<span class="btn btn-outline" style="font-size:0.82rem;padding:8px 18px;cursor:default;opacity:0.5;">${p} 下载 (暂无)</span>`).join('')}
     </div>
     ` : ''}
-    <p class="desc-full">${g.descFull}</p>
+    <div class="desc-full">${renderDescWithImages(g.descFull, g.screenshots)}</div>
     ${g.screenshots && g.screenshots.length ? `
     <div class="screenshot-gallery">
-      <h4>📸 游戏截图 (${g.screenshots.length}张)</h4>
+      <h4>📸 全部截图 (${g.screenshots.length}张)</h4>
       <div class="screenshot-scroll">
-        ${g.screenshots.map((s, i) => `<img class="screenshot-thumb" src="${s}" alt="截图${i+1}" loading="lazy" onclick="event.stopPropagation();currentShotIdx=${i};openLightbox()" onerror="this.style.display='none'">`).join('')}
+        ${g.screenshots.map((s, i) => `<img class="screenshot-thumb" src="${cdn(s)}" alt="截图${i+1}" loading="lazy" decoding="async" onclick="event.stopPropagation();currentShotIdx=${i};openLightbox()" onerror="this.style.display='none'">`).join('')}
       </div>
     </div>
     ` : ''}
@@ -1100,6 +1223,11 @@ const lightboxNext = document.getElementById('lightboxNext');
 function openLightbox() {
   const shots = window._screenshots || [];
   if (!shots.length) return;
+  // 支持从行内图片点击打开
+  if (window._descImgIdx !== undefined) {
+    currentShotIdx = window._descImgIdx;
+    delete window._descImgIdx;
+  }
   updateLightboxImg();
   lightbox.classList.add('show');
   document.body.style.overflow = 'hidden';
@@ -1107,7 +1235,7 @@ function openLightbox() {
 
 function updateLightboxImg() {
   const shots = window._screenshots || [];
-  lightboxImg.src = shots[currentShotIdx] || '';
+  lightboxImg.src = cdn(shots[currentShotIdx] || '');
   lightboxPrev.style.display = shots.length > 1 ? '' : 'none';
   lightboxNext.style.display = shots.length > 1 ? '' : 'none';
 }
@@ -1140,6 +1268,7 @@ lightboxNext.addEventListener('click', e => {
 
 // ===== Initial Render =====
 renderCards();
+updateViewCount();
 </script>
 </body>
 </html>
