@@ -7,3 +7,9 @@
 
 # 临时文件
 新建文件夹/
+
+# 压缩工具临时文件
+node_modules/
+package.json
+package-lock.json
+compress.js
