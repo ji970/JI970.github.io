@@ -332,6 +332,7 @@ body {
   display: flex; align-items: center; gap: 4px;
   color: var(--gold);
 }
+.card-views { color: var(--pink-light); font-weight: 500; }
 
 /* ===== Game Detail Modal ===== */
 .modal-overlay {
@@ -694,7 +695,7 @@ body {
       <div class="stat"><div class="num" id="countGames">7</div><div class="label">收录游戏</div></div>
       <div class="stat"><div class="num">全平台</div><div class="label">PC / Android / Mac</div></div>
       <div class="stat"><div class="num">官方中文</div><div class="label">语言支持</div></div>
-      <div class="stat"><div class="num" id="countViews">...</div><div class="label">👁 浏览总量</div></div>
+      <div class="stat"><div class="num" id="countViews">0</div><div class="label">👁 浏览总量</div></div>
     </div>
   </div>
 </section>
@@ -868,20 +869,27 @@ function cdn(url) {
   return CDN_BASE + url;
 }
 
-// ===== View Counter =====
-function updateViewCount() {
-  const ns = 'galgame-paradise';
-  const key = IS_GITHUB ? location.hostname.replace(/\./g, '-') : 'localhost';
-  const el = document.getElementById('countViews');
-  // 尝试从 countapi 获取，失败则使用 localStorage 兜底
-  fetch('https://api.countapi.xyz/hit/' + ns + '/' + key)
-    .then(r => r.json()).then(d => { el.textContent = d.value.toLocaleString(); })
-    .catch(() => {
-      // 兜底：本地计数
-      let c = parseInt(localStorage.getItem('_gv') || '0');
-      c++; localStorage.setItem('_gv', c);
-      el.textContent = c.toLocaleString();
-    });
+// ===== Per-Game View Counters (localStorage) =====
+function formatViews(n) {
+  if (n >= 10000) return (n / 10000).toFixed(1) + '万';
+  if (n >= 1000) return (n / 1000).toFixed(1) + 'k';
+  return n.toString();
+}
+
+function getGameViews(id) {
+  return parseInt(localStorage.getItem('gv_' + id) || '0');
+}
+
+function incrementGameViews(id) {
+  const key = 'gv_' + id;
+  const next = parseInt(localStorage.getItem(key) || '0') + 1;
+  localStorage.setItem(key, next);
+  return next;
+}
+
+function updateTotalViews() {
+  const total = games.reduce((sum, g) => sum + getGameViews(g.id), 0);
+  document.getElementById('countViews').textContent = formatViews(total);
 }
 
 // ===== Render description with inline images =====
@@ -1355,6 +1363,7 @@ function renderCards() {
         </div>
         <div class="card-footer">
           <span>🛠 ${g.engine}</span>
+          <span class="card-views">👁 ${formatViews(getGameViews(g.id))}</span>
           <span class="rating">⭐ ${g.rating}</span>
         </div>
       `;
@@ -1382,6 +1391,14 @@ const overlay = document.getElementById('modalOverlay');
 const modalClose = document.getElementById('modalClose');
 
 function openModal(g) {
+  const views = incrementGameViews(g.id);
+  updateTotalViews();
+  const idx = games.findIndex(x => x.id === g.id);
+  if (idx >= 0) {
+    const cards = grid.querySelectorAll('.game-card');
+    const viewSpan = cards[idx]?.querySelector('.card-views');
+    if (viewSpan) viewSpan.textContent = '👁 ' + formatViews(views);
+  }
   window._screenshots = g.screenshots || [];
   const coverUrl = cdn(g.cover);
   document.getElementById('modalCover').innerHTML = `<img src="${coverUrl}" alt="${g.title}" style="width:100%;height:260px;object-fit:cover;" loading="lazy" decoding="async" onerror="this.style.background='linear-gradient(135deg,#2d1b69,#be185d)';this.remove();">`;
@@ -1392,6 +1409,7 @@ function openModal(g) {
       <div><span>引擎</span><br><strong>${g.engine}</strong></div>
       <div><span>平台</span><br><strong>${g.platforms.join(' / ')}</strong></div>
       <div><span>评分</span><br><strong style="color:var(--gold);">⭐ ${g.rating}</strong></div>
+          <div><span>浏览</span><br><strong style="color:var(--pink-light);">👁 ${formatViews(views)}</strong></div>
     </div>
     <div style="margin-bottom:16px;">
       ${g.genres.map(t => `<span class="genre-tag" style="margin-right:6px;">${t}</span>`).join('')}
@@ -1489,7 +1507,7 @@ lightboxNext.addEventListener('click', e => {
 
 // ===== Initial Render =====
 renderCards();
-updateViewCount();
+updateTotalViews();
 </script>
 </body>
 </html>
