@@ -858,9 +858,14 @@ body {
 // 使用 jsDelivr CDN 加速 GitHub 图片加载
 // 本地开发留空，部署到 GitHub 后自动使用 CDN
 const IS_GITHUB = location.hostname.includes('github.io');
-const CDN_BASE = IS_GITHUB
-  ? 'https://cdn.jsdelivr.net/gh/' + location.pathname.split('/').slice(0, 3).join('/') + '@main/'
-  : '';
+const CDN_BASE = (() => {
+  if (!IS_GITHUB) return '';
+  // 用户页面: ji970.github.io -> 仓库 ji970/JI970.github.io
+  const host = location.hostname;
+  const username = host.replace('.github.io', '');
+  const repo = username + '.github.io';
+  return 'https://cdn.jsdelivr.net/gh/' + username + '/' + repo + '@master/';
+})();
 
 function cdn(url) {
   if (!CDN_BASE || !url || url.startsWith('http') || url.startsWith('data:')) return url;
