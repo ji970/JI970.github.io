@@ -160,6 +160,46 @@ body {
 }
 .section-header p { color: var(--text-dim); font-size: 0.95rem; }
 
+/* ===== Search Bar ===== */
+.search-wrapper {
+  display: flex; justify-content: center;
+  margin-bottom: 20px;
+}
+.search-input {
+  width: 100%; max-width: 480px;
+  padding: 12px 20px 12px 44px;
+  border-radius: 50px;
+  border: 1.5px solid var(--glass-border);
+  background: var(--glass);
+  color: var(--text);
+  font-size: 0.95rem;
+  outline: none;
+  transition: var(--transition);
+  font-family: inherit;
+}
+.search-input::placeholder { color: var(--text-dim); }
+.search-input:focus {
+  border-color: var(--pink);
+  box-shadow: 0 0 20px rgba(244,114,182,0.15);
+  background: rgba(255,255,255,0.08);
+}
+.search-icon {
+  position: absolute;
+  left: 16px; top: 50%; transform: translateY(-50%);
+  color: var(--text-dim); font-size: 1rem; pointer-events: none;
+  transition: var(--transition);
+}
+.search-input:focus ~ .search-icon,
+.search-wrapper:focus-within .search-icon { color: var(--pink-light); }
+.search-input-wrapper {
+  position: relative; width: 100%; max-width: 480px;
+}
+.no-results {
+  text-align: center; padding: 48px 24px;
+  color: var(--text-dim); font-size: 1rem;
+  grid-column: 1 / -1;
+}
+
 /* ===== Filter Bar ===== */
 .filter-bar {
   display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;
@@ -614,7 +654,7 @@ body {
       <a href="#about" class="btn btn-outline">📖 了解更多</a>
     </div>
     <div class="hero-stats">
-      <div class="stat"><div class="num" id="countGames">5</div><div class="label">收录游戏</div></div>
+      <div class="stat"><div class="num" id="countGames">7</div><div class="label">收录游戏</div></div>
       <div class="stat"><div class="num">全平台</div><div class="label">PC / Android / Mac</div></div>
       <div class="stat"><div class="num">官方中文</div><div class="label">语言支持</div></div>
     </div>
@@ -626,6 +666,13 @@ body {
   <div class="section-header">
     <h2>🎮 游戏库</h2>
     <p>精选恋爱冒险游戏，持续更新中</p>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="search-wrapper">
+    <div class="search-input-wrapper">
+      <input type="text" class="search-input" id="searchInput" placeholder="🔍 搜索游戏名称、类型、描述...">
+    </div>
   </div>
 
   <!-- Filter Tags -->
@@ -861,6 +908,50 @@ const games = [
       "Android": "https://pan.xunlei.com/s/VOfXdqjEUV71AjZ7oy8vlBhTA1?pwd=j3jy"
     },
     descFull: `<b>2025年最值得下载的视觉小说神作来了！《永恒世界 Eternum》0.8.6版本正式解锁。</b>这次更新直接封神——38首全新BGM、1650+张超高清渲染、80段丝滑动态动画，直接把沉浸感拉满！作为Caribdis工作室的扛鼎之作，这游戏从剧情到画面都是教科书级别，P站赞助量吊打同类作品，说它是"虚拟世界版《头号玩家》"都算谦虚了。不管你之前有没有玩过，这次更新必须冲，因为这一版连UI都重做了，流畅度直接飙升三档，剧情线更是埋了一堆反转伏笔。<br><br><b style="font-size:1.1em;color:#f9a8d4;">🎯 更新内容暴击</b><br><br><b>视听盛宴全面升级：</b><br>38首原创BGM覆盖科幻、奇幻、悬疑多种风格，戴上耳机瞬间穿越到克雷登市的虚拟世界。80段动态动画丝滑到离谱，角色微表情连睫毛颤动都看得清，尤其是新角色"莉莉丝"的雨中对峙戏，每一帧都能当壁纸。1650张新渲染图+150+环境音效，连NPC路人的脚步声都做了空间环绕处理，细节控狂喜。<br><br><b>剧情高能预警：</b><br>主线新增"记忆碎片"解谜系统，隐藏结局触发条件更烧脑，上版本埋的"AI觉醒"伏笔终于引爆。支线任务量翻倍，关键选择会影响阵营声望，比如帮黑客组织"暗网"还是站队军方"棱镜计划"，选错一步全员BE警告。<br><br><b>性能优化稳如狗：</b><br>16750行代码重构底层逻辑，加载速度比0.7版快60%，十年前的老电脑也能流畅跑。安卓端同步更新，但PC党强烈建议用大屏——4K分辨率下光影粒子效果直接封神，显卡占用率却不到50%。<br><br><b style="font-size:1.1em;color:#f9a8d4;">💻 配置需求（PC版）</b><br><br><b>最低配置：</b>Win10系统 / i5-4460 / 8GB内存 / GTX 960显卡 / 20GB硬盘空间<br><b>推荐配置：</b>Win11系统 / i7-10700K / 16GB内存 / RTX 3060显卡 / 固态硬盘<br><br>安卓端需Android 9.0以上，运存4GB起步，实测千元机也能60帧满血运行。`
+  },
+  {
+    id: "above-immortality",
+    title: "九界之上",
+    titleCN: "Above The Immortality Realm",
+    version: "v0.4.3",
+    cover: "images/九界之上 Above The Immortality Realm 官方中文完整版 PC版 仙侠策略SLG v0.4.3 巅峰画质版/屏幕截图 2026-05-30 165108.png",
+    genres: ["SLG", "仙侠", "策略", "NTR"],
+    platforms: ["PC"],
+    rating: "8.8",
+    engine: "Unity",
+    desc: "修仙题材NTR向互动SLG，气运掠夺复仇主线，Live2D动态演出，多分支结局，官方中文完整版。",
+    screenshots: [
+      "images/九界之上 Above The Immortality Realm 官方中文完整版 PC版 仙侠策略SLG v0.4.3 巅峰画质版/屏幕截图 2026-05-30 165108.png",
+      "images/九界之上 Above The Immortality Realm 官方中文完整版 PC版 仙侠策略SLG v0.4.3 巅峰画质版/屏幕截图 2026-05-30 165116.png"
+    ],
+    downloads: {
+      "PC": "https://pan.baidu.com/s/1RC0pftmVy7xXBOwDQeQ42g?pwd=xkme#list/path=%2F"
+    },
+    descFull: `<b>九界之上 v0.4.3 是修仙题材NTR向互动SLG中独树一帜的气运掠夺神作。</b>你化身玄门资质平庸的弟子莫生，曾长期遭受天选之子师兄箫天羽的欺凌折辱——而他集绝世天赋、红颜环绕与通天气运于一身，是公认的年轻一代第一人。机缘巧合下你获得可窃取他人"气运"的远古秘宝。你由此展开危险而刺激的复仇计划：步步接近箫天羽身边的女伴，诱导其情感偏移并发生亲密纠葛，同步抽取对方气运壮大自身，直至将这天选之人彻底掏空。全程官方简体中文植入，大量Live2D动态R18演出与多分支路线加持。<br><br><b style="font-size:1.1em;color:#f9a8d4;">🎯 修仙世界观与叙事张力</b><br><br>剧本将古典仙侠的宗门恩怨与NTR情感博弈精妙融合，"气运值"既是核心掠夺数值也左右各女角色对两位男主的倾向判定。角色立绘含丰富面部差分捕捉羞赧、动摇与沉沦的微表情变化，Live2D动态事件演出配合古琴与编钟基调BGM渲染出宗门内外截然不同的氛围。多周目继承气运进度，不同抉择导向守护、黑化或彻底夺妻三种终极结局。<br><br><b style="font-size:1.1em;color:#f9a8d4;">📋 v0.4.3 版本更新</b><br><br>♢ 新增最新章节剧情文本与女角色专属事件链<br>♢ 补全部分早期CG差分<br>♢ 优化Live2D播放帧率稳定性及中文文本溢出修正<br>♢ 增强自动存档容错机制<br><br><b style="font-size:1.1em;color:#f9a8d4;">💻 配置需求</b><br><br><b>最低配置：</b>Windows 7/8.1/10/11（64位）｜i3-2100｜4GB RAM｜DirectX 9.0c显卡｜1.2GB空间<br><b>推荐配置：</b>Windows 10/11（64位）｜i5-4570｜8GB RAM｜GTX 750 Ti+｜SSD推荐`
+  },
+  {
+    id: "night-bloom",
+    title: "夜幕之花",
+    titleCN: "Night Bloom",
+    version: "v0.657",
+    cover: "images/夜幕之花 夜之绽放 Night Bloom PC+安卓版 日系NTR冒险RPG 官方中文无修正版 v0.657/屏幕截图 2026-05-30 165725.png",
+    genres: ["RPG", "日系", "NTR", "冒险", "奇幻"],
+    platforms: ["PC", "Android"],
+    rating: "9.0",
+    engine: "RPG Maker MV",
+    desc: "日系RPG Maker NTR叙事神作，双时间轴暗黑博弈，未婚妻堕落轨迹追踪，含全通关存档，PC+安卓双端。",
+    screenshots: [
+      "images/夜幕之花 夜之绽放 Night Bloom PC+安卓版 日系NTR冒险RPG 官方中文无修正版 v0.657/屏幕截图 2026-05-30 165725.png",
+      "images/夜幕之花 夜之绽放 Night Bloom PC+安卓版 日系NTR冒险RPG 官方中文无修正版 v0.657/屏幕截图 2026-05-30 165733.png",
+      "images/夜幕之花 夜之绽放 Night Bloom PC+安卓版 日系NTR冒险RPG 官方中文无修正版 v0.657/屏幕截图 2026-05-30 165740.png",
+      "images/夜幕之花 夜之绽放 Night Bloom PC+安卓版 日系NTR冒险RPG 官方中文无修正版 v0.657/屏幕截图 2026-05-30 165749.png",
+      "images/夜幕之花 夜之绽放 Night Bloom PC+安卓版 日系NTR冒险RPG 官方中文无修正版 v0.657/屏幕截图 2026-05-30 165757.png"
+    ],
+    downloads: {
+      "PC": "https://pan.baidu.com/s/1AhfwvAwvlftQXgL9Cln-RQ?pwd=8ujr#list/path=%2F",
+      "Android": "https://pan.baidu.com/s/1AhfwvAwvlftQXgL9Cln-RQ?pwd=8ujr#list/path=%2F"
+    },
+    descFull: `<b>夜幕之花 夜之绽放 Night Bloom v0.657 是日系RPG Maker MV引擎下NTR叙事类作品的顶尖代表。</b>你扮演边境村庄平凡青年莱恩，青梅竹马的未婚妻艾莉丝被选为年度祭品送往王都神殿——你追随其后潜入奢靡权贵圈层，却发现所谓的神眷仪式暗藏肮脏交易。游戏采用经典ATB半即时遇敌战斗结合多分支对话树，艾莉丝在王都的遭遇随你的介入程度与情报搜集量产生截然不同的偏移轨迹。官方简体中文全文本植入，无修正版完整收录所有亲密事件差分，附赠全进度通关存档，PC与安卓双端完美兼容。<br><br><b style="font-size:1.1em;color:#f9a8d4;">🎯 叙事张力与美术演出</b><br><br>剧本以双时间轴呈现——莱恩在王都暗巷调查线索、贿赂守卫、偷窥神殿密室，艾莉丝则在独立日记中记录心境从虔诚到动摇的全过程。立绘由知名原画师绘制，艾莉丝含祭司袍、常服及礼服三套换装差分，面部微表情随堕落倾向阶梯式演变。BGM从乡村民谣无缝切换至圣堂管风琴再转入暧昧低音，氛围渲染极具电影质感。<br><br><b style="font-size:1.1em;color:#f9a8d4;">📋 v0.657 版本更新</b><br><br>♢ 追加最新章节调查事件与新CG差分<br>♢ 补全部分支线任务文本<br>♢ 优化安卓端虚拟按键布局与字体渲染清晰度<br>♢ 修复特定存档读取时报错问题<br>♢ 打包内含完美通关存档可直接体验全分支<br><br><b style="font-size:1.1em;color:#f9a8d4;">💻 配置需求</b><br><br><b>PC最低：</b>Windows 7+（32/64位）｜Atom Z3700｜2GB RAM｜512MB显存｜2GB空间<br><b>Android最低：</b>Android 6.0｜骁龙625｜2GB RAM<br><b>推荐：</b>Win 10/11｜i3或同级｜4GB RAM｜1280×720+｜SSD推荐`
   }
 ];
 
@@ -868,45 +959,65 @@ const games = [
 // ===== Render Game Cards =====
 const grid = document.getElementById('gameGrid');
 
-function renderCards(filter = 'all') {
-  grid.innerHTML = '';
-  const filtered = filter === 'all'
-    ? games
-    : games.filter(g => g.genres.some(t => t.toLowerCase().includes(filter)) ||
-                         g.platforms.some(p => p.toLowerCase() === filter));
+// State
+let currentFilter = 'all';
 
-  filtered.forEach(g => {
-    const card = document.createElement('div');
-    card.className = 'game-card';
-    card.onclick = () => openModal(g);
-    card.innerHTML = `
-      <div class="card-cover">
-        <img class="cover-img" src="${g.cover}" alt="${g.title}" loading="lazy"
-             onerror="this.style.background='linear-gradient(135deg,#2d1b69,#be185d)';this.removeAttribute('src');">
-        <div class="platform-badge">
-          ${g.platforms.map(p => `<span class="platform-tag">${p}</span>`).join('')}
-        </div>
-      </div>
-      <div class="card-body">
-        <div class="card-title">
-          ${g.title}
-          <span class="ver">${g.version}</span>
-        </div>
-        <div class="card-genres">
-          ${g.genres.map(t => `<span class="genre-tag">${t}</span>`).join('')}
-        </div>
-        <p class="card-desc">${g.desc}</p>
-      </div>
-          <div class="card-downloads">
-            ${g.downloads && Object.keys(g.downloads).length > 0 ? Object.keys(g.downloads).map(p => g.downloads[p] ? `<a class="card-dl-btn" href="${g.downloads[p]}" target="_blank" rel="noopener" onclick="event.stopPropagation()">📥 ${p}下载</a>` : `<span class="card-dl-btn no-url">${p} (暂无)</span>`).join(' ') : ''}
+function renderCards() {
+  const query = document.getElementById('searchInput').value.trim().toLowerCase();
+  grid.innerHTML = '';
+
+  let filtered = currentFilter === 'all'
+    ? games
+    : games.filter(g => g.genres.some(t => t.toLowerCase().includes(currentFilter)) ||
+                         g.platforms.some(p => p.toLowerCase() === currentFilter));
+
+  if (query) {
+    filtered = filtered.filter(g =>
+      g.title.toLowerCase().includes(query) ||
+      g.titleCN.toLowerCase().includes(query) ||
+      g.genres.some(t => t.toLowerCase().includes(query)) ||
+      g.platforms.some(p => p.toLowerCase().includes(query)) ||
+      g.desc.toLowerCase().includes(query) ||
+      g.engine.toLowerCase().includes(query)
+    );
+  }
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '<div class="no-results">🔍 没有找到匹配的游戏，试试其他关键词吧 ~</div>';
+  } else {
+    filtered.forEach(g => {
+      const card = document.createElement('div');
+      card.className = 'game-card';
+      card.onclick = () => openModal(g);
+      card.innerHTML = `
+        <div class="card-cover">
+          <img class="cover-img" src="${g.cover}" alt="${g.title}" loading="lazy"
+               onerror="this.style.background='linear-gradient(135deg,#2d1b69,#be185d)';this.removeAttribute('src');">
+          <div class="platform-badge">
+            ${g.platforms.map(p => `<span class="platform-tag">${p}</span>`).join('')}
           </div>
-          <div class="card-footer">
-            <span>🛠 ${g.engine}</span>
-            <span class="rating">⭐ ${g.rating}</span>
+        </div>
+        <div class="card-body">
+          <div class="card-title">
+            ${g.title}
+            <span class="ver">${g.version}</span>
           </div>
-    `;
-    grid.appendChild(card);
-  });
+          <div class="card-genres">
+            ${g.genres.map(t => `<span class="genre-tag">${t}</span>`).join('')}
+          </div>
+          <p class="card-desc">${g.desc}</p>
+        </div>
+        <div class="card-downloads">
+          ${g.downloads && Object.keys(g.downloads).length > 0 ? Object.keys(g.downloads).map(p => g.downloads[p] ? `<a class="card-dl-btn" href="${g.downloads[p]}" target="_blank" rel="noopener" onclick="event.stopPropagation()">📥 ${p}下载</a>` : `<span class="card-dl-btn no-url">${p} (暂无)</span>`).join(' ') : ''}
+        </div>
+        <div class="card-footer">
+          <span>🛠 ${g.engine}</span>
+          <span class="rating">⭐ ${g.rating}</span>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+  }
 
   document.getElementById('countGames').textContent = filtered.length;
 }
@@ -916,8 +1027,12 @@ document.getElementById('filterBar').addEventListener('click', e => {
   if (!e.target.classList.contains('filter-tag')) return;
   document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
   e.target.classList.add('active');
-  renderCards(e.target.dataset.filter);
+  currentFilter = e.target.dataset.filter;
+  renderCards();
 });
+
+// ===== Search =====
+document.getElementById('searchInput').addEventListener('input', renderCards);
 
 // ===== Modal =====
 const overlay = document.getElementById('modalOverlay');
