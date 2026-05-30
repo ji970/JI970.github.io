@@ -237,6 +237,26 @@ body {
   grid-column: 1 / -1;
 }
 
+n/* ===== Pagination ===== */
+.pagination {
+  display: flex; justify-content: center; align-items: center;
+  gap: 8px; margin-top: 32px; flex-wrap: wrap;
+}
+.pg-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 40px; height: 40px; padding: 0 12px;
+  border-radius: 10px; border: 1px solid var(--glass-border);
+  background: var(--glass); color: var(--text-dim);
+  font-size: 0.9rem; cursor: pointer; transition: var(--transition);
+  user-select: none;
+}
+.pg-btn:hover { border-color: var(--pink); color: var(--text); }
+.pg-btn.active {
+  background: linear-gradient(135deg, var(--pink), var(--purple-deep));
+  color: #fff; border-color: transparent;
+  box-shadow: 0 4px 16px rgba(244,114,182,0.3);
+}
+.pg-btn:disabled { opacity: 0.3; pointer-events: none; }
 /* ===== Filter Bar ===== */
 .filter-bar {
   display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;
@@ -332,6 +352,7 @@ body {
   display: flex; align-items: center; gap: 4px;
   color: var(--gold);
 }
+.card-views { color: var(--pink-light); font-weight: 500; }
 
 /* ===== Game Detail Modal ===== */
 .modal-overlay {
@@ -694,7 +715,7 @@ body {
       <div class="stat"><div class="num" id="countGames">7</div><div class="label">收录游戏</div></div>
       <div class="stat"><div class="num">全平台</div><div class="label">PC / Android / Mac</div></div>
       <div class="stat"><div class="num">官方中文</div><div class="label">语言支持</div></div>
-      <div class="stat"><div class="num" id="countViews">...</div><div class="label">👁 浏览总量</div></div>
+      <div class="stat"><div class="num" id="countViews">0</div><div class="label">👁 浏览总量</div></div>
     </div>
   </div>
 </section>
@@ -727,6 +748,7 @@ body {
   <div class="game-grid" id="gameGrid">
     <!-- Cards injected by JS -->
   </div>
+  <div class="pagination" id="pagination"></div>
 </section>
 
 <!-- Install Guide Section -->
@@ -868,20 +890,27 @@ function cdn(url) {
   return CDN_BASE + url;
 }
 
-// ===== View Counter =====
-function updateViewCount() {
-  const ns = 'galgame-paradise';
-  const key = IS_GITHUB ? location.hostname.replace(/\./g, '-') : 'localhost';
-  const el = document.getElementById('countViews');
-  // 尝试从 countapi 获取，失败则使用 localStorage 兜底
-  fetch('https://api.countapi.xyz/hit/' + ns + '/' + key)
-    .then(r => r.json()).then(d => { el.textContent = d.value.toLocaleString(); })
-    .catch(() => {
-      // 兜底：本地计数
-      let c = parseInt(localStorage.getItem('_gv') || '0');
-      c++; localStorage.setItem('_gv', c);
-      el.textContent = c.toLocaleString();
-    });
+// ===== Per-Game View Counters (localStorage) =====
+function formatViews(n) {
+  if (n >= 10000) return (n / 10000).toFixed(1) + '万';
+  if (n >= 1000) return (n / 1000).toFixed(1) + 'k';
+  return n.toString();
+}
+
+function getGameViews(id) {
+  return parseInt(localStorage.getItem('gv_' + id) || '0');
+}
+
+function incrementGameViews(id) {
+  const key = 'gv_' + id;
+  const next = parseInt(localStorage.getItem(key) || '0') + 1;
+  localStorage.setItem(key, next);
+  return next;
+}
+
+function updateTotalViews() {
+  const total = games.reduce((sum, g) => sum + getGameViews(g.id), 0);
+  document.getElementById('countViews').textContent = formatViews(total);
 }
 
 // ===== Render description with inline images =====
@@ -1295,6 +1324,39 @@ const games = [
 <br><br><b style="font-size:1.1em;color:#f9a8d4;">📋 版本特性</b><br><br>♢ Ver1.1 版本已追加全新动画内容<br>♢ 汉化版本确保国内玩家无障碍体验完整剧情<br>♢ 游戏底层代码经过深度优化，稳定运行<br>♢ 画廊模式——轻松回顾精彩剧情<br>♢ 区域选择系统——自由选择关卡<br>♢ 手柄支持+按键自定义
 <br><br>[screenshot:2]
 <br><br><b style="font-size:1.1em;color:#f9a8d4;">💻 配置需求</b><br><br><b>最低配置：</b>i3-2100｜4GB RAM｜GTX 650｜2GB显存<br><b>推荐配置：</b>i5-7500｜8GB RAM｜GTX 1050 Ti`
+  },
+  {
+    id: "reya-the-elf",
+    title: "Reya the Elf",
+    titleCN: "精灵蕾雅",
+    version: "v0.7.3 SE",
+    cover: "images/精灵蕾雅 Reya the Elf PC+安卓版 3D沙盒SLG 堕落成长物语 AI汉化版 v0.7.3 SE/屏幕截图 2026-05-31 005958.png",
+    genres: ["SLG", "沙盒", "养成"],
+    platforms: ["PC", "Android"],
+    rating: "9.1",
+    engine: "Unity 3D",
+    desc: "女性主角3D沙盒SLG巅峰神作。精灵少女蕾雅为父还债只身入都市，按摩院打工、健身房训练、夜店探索，纯洁与堕落一念之间。全动态演出，多结局。",
+    screenshots: [
+      "images/精灵蕾雅 Reya the Elf PC+安卓版 3D沙盒SLG 堕落成长物语 AI汉化版 v0.7.3 SE/屏幕截图 2026-05-31 005958.png",
+      "images/精灵蕾雅 Reya the Elf PC+安卓版 3D沙盒SLG 堕落成长物语 AI汉化版 v0.7.3 SE/屏幕截图 2026-05-31 010011.png",
+      "images/精灵蕾雅 Reya the Elf PC+安卓版 3D沙盒SLG 堕落成长物语 AI汉化版 v0.7.3 SE/屏幕截图 2026-05-31 010017.png",
+      "images/精灵蕾雅 Reya the Elf PC+安卓版 3D沙盒SLG 堕落成长物语 AI汉化版 v0.7.3 SE/屏幕截图 2026-05-31 010025.png",
+      "images/精灵蕾雅 Reya the Elf PC+安卓版 3D沙盒SLG 堕落成长物语 AI汉化版 v0.7.3 SE/屏幕截图 2026-05-31 010032.png"
+    ],
+    downloads: {
+      "PC": "https://pan.baidu.com/s/199FwHIK3f0CiXxTd-2ie8Q?pwd=r6yc",
+      "Android": "https://pan.baidu.com/s/199FwHIK3f0CiXxTd-2ie8Q?pwd=r6yc"
+    },
+    descFull: `<b>《精灵蕾雅 Reya the Elf》是当代女性主角向3D沙盒SLG中叙事深度与演出规格双双登顶的神作。</b>十八岁的精灵少女雷雅为替父亲偿还欠债，只身离开森林投奔经营按摩院的人类叔叔山姆。你将全权掌管她在都市中的每一天——安排按摩院打工、健身房训练、夜店兼职与街头探索，通过对话抉择左右她的纯洁值与堕落倾向，最终导向回归森林或彻底沉沦的多重结局。本版搭载AI增强汉化文本与全动态演出，PC安卓双端互通，绝对是近年都市奇幻养成类SLG的必玩收藏。
+<br><br>[screenshot:0]
+<br><br><b style="font-size:1.1em;color:#f9a8d4;">🎯 沙盒养成与堕落系统</b><br><br>游戏采用四时段日程沙盒机制，早午晚深夜自由分配行动点。核心数值包含能量、金钱、纯洁/堕落槽及角色关系度，按摩院可升级精油与沐浴按摩服务解锁特殊客人互动，健身房新增名声系统与体能挑战。3D实时渲染角色模型配有动态骨骼差分，换装系统涵盖制服、运动服与晚礼服，城市各区域隐藏支线事件随好感度阶梯式解锁，剧本分支严谨考究道德抉择的重量。
+<br><br>[screenshot:1]
+<br><br><b style="font-size:1.1em;color:#f9a8d4;">📋 v0.7.3 SE 版本内容</b><br><br>♢ 重制公园与杰夫看电影活动动画<br>♢ 新增服饰店娜迪亚新事件与待机演出<br>♢ 优化画廊分类、字幕式对话框及HUD布局<br>♢ 修复部分安卓端纹理加载异常<br>♢ PC安卓双端同步更新
+<br><br>[screenshot:2]
+<br><br><b style="font-size:1.1em;color:#f9a8d4;">💻 配置需求</b><br><br><b>最低配置：</b>Windows 7/10/11（64位）或 Android 7.0｜Intel i3 / 骁龙 660｜4GB RAM｜DirectX 11兼容显卡<br><b>推荐配置：</b>Intel i5-6500 / Ryzen 5｜8GB RAM｜GTX 960及以上｜SSD推荐
+<br><br>[screenshot:3]
+<br><br><b style="font-size:1.1em;color:#f9a8d4;">⭐ 游玩建议</b><br><br>新手建议优先提升按摩院技能解锁特殊服务线，资金充裕后购入晚礼服开启夜店高阶剧情。纯洁路线与堕落路线的中期分支大约在第15个游戏日触发，建议提前手动存档以便多周目回收结局。
+<br><br>[screenshot:4]`
   }
 ];
 
@@ -1304,6 +1366,8 @@ const grid = document.getElementById('gameGrid');
 
 // State
 let currentFilter = 'all';
+let currentPage = 1;
+const GAMES_PER_PAGE = 9;
 
 function renderCards() {
   const query = document.getElementById('searchInput').value.trim().toLowerCase();
@@ -1327,8 +1391,15 @@ function renderCards() {
 
   if (filtered.length === 0) {
     grid.innerHTML = '<div class="no-results">🔍 没有找到匹配的游戏，试试其他关键词吧 ~</div>';
+    document.getElementById('pagination').innerHTML = '';
   } else {
-    filtered.forEach(g => {
+    // Pagination
+    const totalPages = Math.ceil(filtered.length / GAMES_PER_PAGE);
+    if (currentPage > totalPages) currentPage = totalPages;
+    const start = (currentPage - 1) * GAMES_PER_PAGE;
+    const pageGames = filtered.slice(start, start + GAMES_PER_PAGE);
+
+    pageGames.forEach(g => {
       const card = document.createElement('div');
       card.className = 'game-card';
       card.onclick = () => openModal(g);
@@ -1355,11 +1426,33 @@ function renderCards() {
         </div>
         <div class="card-footer">
           <span>🛠 ${g.engine}</span>
+          <span class="card-views">👁 ${formatViews(getGameViews(g.id))}</span>
           <span class="rating">⭐ ${g.rating}</span>
         </div>
       `;
       grid.appendChild(card);
     });
+
+    // Render page buttons
+    const pgDiv = document.getElementById('pagination');
+    pgDiv.innerHTML = '';
+    if (totalPages > 1) {
+      pgDiv.innerHTML += `<button class="pg-btn" data-page="${currentPage - 1}" ${currentPage === 1 ? 'disabled' : ''}>«</button>`;
+      for (let p = 1; p <= totalPages; p++) {
+        pgDiv.innerHTML += `<button class="pg-btn ${p === currentPage ? 'active' : ''}" data-page="${p}">${p}</button>`;
+      }
+      pgDiv.innerHTML += `<button class="pg-btn" data-page="${currentPage + 1}" ${currentPage === totalPages ? 'disabled' : ''}>»</button>`;
+      pgDiv.querySelectorAll('.pg-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const page = parseInt(btn.dataset.page);
+          if (page >= 1 && page <= totalPages) {
+            currentPage = page;
+            renderCards();
+            document.getElementById('games').scrollIntoView({ behavior: 'smooth' });
+          }
+        });
+      });
+    }
   }
 
   document.getElementById('countGames').textContent = filtered.length;
@@ -1371,17 +1464,29 @@ document.getElementById('filterBar').addEventListener('click', e => {
   document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
   e.target.classList.add('active');
   currentFilter = e.target.dataset.filter;
+  currentPage = 1;
   renderCards();
 });
 
 // ===== Search =====
-document.getElementById('searchInput').addEventListener('input', renderCards);
+document.getElementById('searchInput').addEventListener('input', () => {
+  currentPage = 1;
+  renderCards();
+});
 
 // ===== Modal =====
 const overlay = document.getElementById('modalOverlay');
 const modalClose = document.getElementById('modalClose');
 
 function openModal(g) {
+  const views = incrementGameViews(g.id);
+  updateTotalViews();
+  const idx = games.findIndex(x => x.id === g.id);
+  if (idx >= 0) {
+    const cards = grid.querySelectorAll('.game-card');
+    const viewSpan = cards[idx]?.querySelector('.card-views');
+    if (viewSpan) viewSpan.textContent = '👁 ' + formatViews(views);
+  }
   window._screenshots = g.screenshots || [];
   const coverUrl = cdn(g.cover);
   document.getElementById('modalCover').innerHTML = `<img src="${coverUrl}" alt="${g.title}" style="width:100%;height:260px;object-fit:cover;" loading="lazy" decoding="async" onerror="this.style.background='linear-gradient(135deg,#2d1b69,#be185d)';this.remove();">`;
@@ -1392,6 +1497,7 @@ function openModal(g) {
       <div><span>引擎</span><br><strong>${g.engine}</strong></div>
       <div><span>平台</span><br><strong>${g.platforms.join(' / ')}</strong></div>
       <div><span>评分</span><br><strong style="color:var(--gold);">⭐ ${g.rating}</strong></div>
+          <div><span>浏览</span><br><strong style="color:var(--pink-light);">👁 ${formatViews(views)}</strong></div>
     </div>
     <div style="margin-bottom:16px;">
       ${g.genres.map(t => `<span class="genre-tag" style="margin-right:6px;">${t}</span>`).join('')}
@@ -1489,7 +1595,7 @@ lightboxNext.addEventListener('click', e => {
 
 // ===== Initial Render =====
 renderCards();
-updateViewCount();
+updateTotalViews();
 </script>
 </body>
 </html>
