@@ -237,6 +237,26 @@ body {
   grid-column: 1 / -1;
 }
 
+n/* ===== Pagination ===== */
+.pagination {
+  display: flex; justify-content: center; align-items: center;
+  gap: 8px; margin-top: 32px; flex-wrap: wrap;
+}
+.pg-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 40px; height: 40px; padding: 0 12px;
+  border-radius: 10px; border: 1px solid var(--glass-border);
+  background: var(--glass); color: var(--text-dim);
+  font-size: 0.9rem; cursor: pointer; transition: var(--transition);
+  user-select: none;
+}
+.pg-btn:hover { border-color: var(--pink); color: var(--text); }
+.pg-btn.active {
+  background: linear-gradient(135deg, var(--pink), var(--purple-deep));
+  color: #fff; border-color: transparent;
+  box-shadow: 0 4px 16px rgba(244,114,182,0.3);
+}
+.pg-btn:disabled { opacity: 0.3; pointer-events: none; }
 /* ===== Filter Bar ===== */
 .filter-bar {
   display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;
@@ -728,6 +748,7 @@ body {
   <div class="game-grid" id="gameGrid">
     <!-- Cards injected by JS -->
   </div>
+  <div class="pagination" id="pagination"></div>
 </section>
 
 <!-- Install Guide Section -->
@@ -1312,6 +1333,8 @@ const grid = document.getElementById('gameGrid');
 
 // State
 let currentFilter = 'all';
+let currentPage = 1;
+const GAMES_PER_PAGE = 9;
 
 function renderCards() {
   const query = document.getElementById('searchInput').value.trim().toLowerCase();
@@ -1335,8 +1358,15 @@ function renderCards() {
 
   if (filtered.length === 0) {
     grid.innerHTML = '<div class="no-results">🔍 没有找到匹配的游戏，试试其他关键词吧 ~</div>';
+    document.getElementById('pagination').innerHTML = '';
   } else {
-    filtered.forEach(g => {
+    // Pagination
+    const totalPages = Math.ceil(filtered.length / GAMES_PER_PAGE);
+    if (currentPage > totalPages) currentPage = totalPages;
+    const start = (currentPage - 1) * GAMES_PER_PAGE;
+    const pageGames = filtered.slice(start, start + GAMES_PER_PAGE);
+
+    pageGames.forEach(g => {
       const card = document.createElement('div');
       card.className = 'game-card';
       card.onclick = () => openModal(g);
@@ -1369,6 +1399,27 @@ function renderCards() {
       `;
       grid.appendChild(card);
     });
+
+    // Render page buttons
+    const pgDiv = document.getElementById('pagination');
+    pgDiv.innerHTML = '';
+    if (totalPages > 1) {
+      pgDiv.innerHTML += `<button class="pg-btn" data-page="${currentPage - 1}" ${currentPage === 1 ? 'disabled' : ''}>«</button>`;
+      for (let p = 1; p <= totalPages; p++) {
+        pgDiv.innerHTML += `<button class="pg-btn ${p === currentPage ? 'active' : ''}" data-page="${p}">${p}</button>`;
+      }
+      pgDiv.innerHTML += `<button class="pg-btn" data-page="${currentPage + 1}" ${currentPage === totalPages ? 'disabled' : ''}>»</button>`;
+      pgDiv.querySelectorAll('.pg-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const page = parseInt(btn.dataset.page);
+          if (page >= 1 && page <= totalPages) {
+            currentPage = page;
+            renderCards();
+            document.getElementById('games').scrollIntoView({ behavior: 'smooth' });
+          }
+        });
+      });
+    }
   }
 
   document.getElementById('countGames').textContent = filtered.length;
@@ -1380,11 +1431,15 @@ document.getElementById('filterBar').addEventListener('click', e => {
   document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
   e.target.classList.add('active');
   currentFilter = e.target.dataset.filter;
+  currentPage = 1;
   renderCards();
 });
 
 // ===== Search =====
-document.getElementById('searchInput').addEventListener('input', renderCards);
+document.getElementById('searchInput').addEventListener('input', () => {
+  currentPage = 1;
+  renderCards();
+});
 
 // ===== Modal =====
 const overlay = document.getElementById('modalOverlay');
