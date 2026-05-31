@@ -759,7 +759,7 @@ n/* ===== Pagination ===== */
     <div class="notice-banner-inner">
       <span class="notice-text">
         <span class="notice-icon">⚠️</span>
-        本站资源<strong>全免费</strong>，纯热心分享。下载后显示为图片/视频/文本都是<strong>正常现象</strong>，按照下方「解压小贴士」的方法<strong>改后缀</strong>即可解压。解压软件最好使用<strong>本站提供的 WinRAR</strong>，否则可能会出现「压缩包损坏」「非压缩包」等错误提示。
+        本站资源<strong>全免费</strong>，纯热心分享。下载后显示为图片/视频/文本都是<strong>正常现象</strong>，按照下方「解压小贴士」的方法<strong>改后缀</strong>即可解压。解压软件最好使用<strong>本站提供的 WinRAR</strong>，否则可能会出现「压缩包损坏」「非压缩包」等错误提示。<strong>如果实在不行，请更换下载链接。</strong>
       </span>
     </div>
   </div>
@@ -815,11 +815,11 @@ n/* ===== Pagination ===== */
           </span>
           <span class="tool-arrow">→</span>
         </a>
-        <a class="tool-item" href="https://pan.baidu.com/s/16yeZ_wq141HwCsnQmTvBZA?pwd=yz3i" target="_blank" rel="noopener">
+        <a class="tool-item" href="https://drive.uc.cn/s/2f7dd9d51c534?public=1#/list/share" target="_blank" rel="noopener">
           <span class="tool-icon">📱</span>
           <span class="tool-info">
-            <span class="tool-name">手机端解压工具（百度网盘）</span>
-            <span class="tool-desc">安卓解压工具合集，提取码: tim4</span>
+            <span class="tool-name">手机端解压工具（UC网盘）</span>
+            <span class="tool-desc">安卓解压工具合集</span>
           </span>
           <span class="tool-arrow">→</span>
         </a>
@@ -892,6 +892,16 @@ function cdn(url) {
   return CDN_BASE + url;
 }
 
+function getStorageLabel(url) {
+  if (!url) return '';
+  if (url.includes('pan.baidu.com')) return '百度网盘';
+  if (url.includes('pan.xunlei.com')) return '迅雷网盘';
+  if (url.includes('drive.uc.cn')) return 'UC网盘';
+  if (url.includes('pan.quark.cn')) return '夸克网盘';
+  if (url.includes('feemoo.com')) return '飞猫网盘';
+  return ''; // 官网或其他
+}
+
 // ===== Per-Game View Counters (localStorage) =====
 function formatViews(n) {
   if (n >= 10000) return (n / 10000).toFixed(1) + '万';
@@ -949,8 +959,9 @@ const games = [
       "images/Phoenixes-v15_Android/scr-05.png"
     ],
     downloads: {
-      "PC": "https://pan.xunlei.com/s/VOb_z088y_JSrZYyOUHsdDcFA1?pwd=casv",
-      "Android": "https://pan.xunlei.com/s/VOb_z088y_JSrZYyOUHsdDcFA1?pwd=casv"
+      "PC/安卓": "https://pan.xunlei.com/s/VOb_z088y_JSrZYyOUHsdDcFA1?pwd=casv",
+      "PC/安卓(百度)": "https://pan.baidu.com/s/1dBH4CVu6JCPRPhcwXBQmkQ?pwd=gjh8#list/path=%2F",
+      "PC/安卓(飞猫)": "https://www.feemoo.com/s/nitfi6"
     },
     descFull: `<b>如果你还没入坑《凤凰 Phoenixes》，现在就是最佳时机。</b>V16版本用126张动态CG+37段高密度剧情，彻底颠覆"视觉小说"的刻板印象。从水墨风转场到角色微表情颤抖，每一帧都在证明：国产团队完全有能力做出比肩《美德》的顶级叙事体验。更狠的是这次更新直接解锁【艾妮妲】核心线——这个让80%玩家意难平的神秘角色，终于揭开她与超能力组织的致命羁绊。
 <br><br>[screenshot:0]
@@ -984,8 +995,9 @@ const games = [
       "images/Agent17-0.26.6/scr-06.png"
     ],
     downloads: {
-      "PC": "https://pan.xunlei.com/s/VOljYe1GSlYzdzhAItEYXmd0A1?pwd=vtz3",
-      "Android": "https://pan.xunlei.com/s/VOljYe1GSlYzdzhAItEYXmd0A1?pwd=vtz3"
+      "PC/安卓": "https://pan.xunlei.com/s/VOljYe1GSlYzdzhAItEYXmd0A1?pwd=vtz3",
+      "PC/安卓(百度)": "https://pan.baidu.com/s/1xe3xcnzRutagZYtcemQZPw?pwd=dng4#list/path=%2F",
+      "PC/安卓(飞猫)": "https://www.feemoo.com/s/t6nnir"
     },
     descFull: `<b>《特工17》（Agent17）是当今都市谍战题材模拟RPG领域绝对的统治级杰作。</b>它不仅在叙事深度上达到了同类作品难以企及的高度，更在视觉呈现与交互逻辑上展现了工业级的顶尖水准。本作彻底重构了间谍生涯的沉浸感，每一名角色的塑造都拥有极强的生命力与独特的行为逻辑。
 <br><br>[screenshot:0]
@@ -1156,7 +1168,8 @@ const games = [
       "images/【亚洲SLG中文全动态】蜉蝣重制版 V0.2 官方中文步兵版 安卓+PC【更新3.6G】/屏幕截图 2026-05-30 223722.png"
     ],
     downloads: {
-      "PC/安卓": "https://pan.baidu.com/s/193PnDIxiKl8qDCeRU-UKKQ?pwd=cmuy#list/path=%2F"
+      "PC/安卓": "https://pan.baidu.com/s/193PnDIxiKl8qDCeRU-UKKQ?pwd=cmuy#list/path=%2F",
+      "PC/安卓(UC)": "https://drive.uc.cn/s/4396f7136b684?public=1#/list/share"
     },
     descFull: `<b>打开这款游戏前，请做好被建模精度震撼的准备——当水墨渲染的衣袂拂过屏幕，当青丝随风扬起的光影投在你脸上，你会明白《MayFly 蜉蝣》EP2重置版重新定义了东方视觉艺术的天花板。</b>作为国风SLG领域真正具有里程碑意义的作品，本次1135张重构渲染+14组动态CG的视觉轰炸，配合三十首原创国乐音轨，将带给你沉浸体验。
 <br><br>[screenshot:0]
@@ -1228,7 +1241,8 @@ const games = [
       "images/妈妈为何这样 他让她堕落 He Maid Her Fall PC+安卓版 母子关系NTR互动SLG 官方中文版 v0.8.6/屏幕截图 2026-05-30 222712.png"
     ],
     downloads: {
-      "PC/安卓": "https://pan.xunlei.com/s/VOfMM0-_Ea9EMedDyLg_z6eLA1?pwd=gfvm"
+      "PC/安卓": "https://pan.xunlei.com/s/VOfMM0-_Ea9EMedDyLg_z6eLA1?pwd=gfvm",
+      "PC/安卓(百度)": "https://pan.baidu.com/s/1VdKFf4xHcOhZKP_7NhGKlw?pwd=7t8c#list/path=%2F"
     },
     descFull: `<b>妈妈为何这样（He Maid Her Fall）v0.8.6 是 Hangover Cat Purrroduction 出品的顶级家庭伦理向互动SLG，也是 NTR 叙事类作品中虐心与温情并存的巅峰代表。</b>大学生强尼遭校园霸凌者德克斯百般刁难，母亲凯特为替儿子争取补偿，竟接受德克斯家族聘请成为贴身女仆——服侍的正是那个毁了儿子大学生活的恶少。全程官方简繁中文、动态CG演出与多分支结局。
 <br><br>[screenshot:0]
@@ -1287,8 +1301,11 @@ const games = [
       "images/甜蜜女友 3 アマカノ 3 PC 纯爱拔作 ADV 汉化版/屏幕截图 2026-05-30 222034.png"
     ],
     downloads: {
-      "PC": "https://pan.baidu.com/s/1Z2eJVVVmMoLIt066DaoiQA?pwd=bakd#list/path=%2F"
+      "PC": "https://pan.baidu.com/s/1Z2eJVVVmMoLIt066DaoiQA?pwd=bakd#list/path=%2F",
+      "PC(飞猫·分卷1)": "https://www.feemoo.com/s/t6nnir",
+      "PC(飞猫·分卷2)": "https://www.feemoo.com/s/q0gpy7"
     },
+    downloadNote: "⚠️ 飞猫两个分卷需一起下载才能解压",
     descFull: `<b>《甜蜜女友 3 アマカノ 3》作为系列续作，延续了前作备受好评的纯爱内核与拔作 ADV 玩法。</b>本次带来的 PC 端先行体验版，通过 AI 技术完成了核心内容的汉化适配，让玩家能提前感受新作的剧情脉络与角色互动。可体验约 1-2 小时的游戏流程。
 <br><br>[screenshot:0]
 <br><br><b style="font-size:1.1em;color:#f9a8d4;">📋 版本信息</b><br><br>适配平台：PC<br>游戏类型：拔作 ADV、纯爱<br>版本性质：先行体验版<br>汉化情况：AI 汉化<br><br>开放了游戏前期的主线剧情章节，包含主要女主角的初始互动场景及世界观铺垫内容。基于 AI 汉化技术完成了剧情文本、角色对话及 UI 界面的汉化处理，修复了文本乱码、显示不全等问题。
@@ -1424,7 +1441,8 @@ function renderCards() {
           <p class="card-desc">${g.desc}</p>
         </div>
         <div class="card-downloads">
-          ${g.downloads && Object.keys(g.downloads).length > 0 ? Object.keys(g.downloads).map(p => g.downloads[p] ? `<a class="card-dl-btn" href="${g.downloads[p]}" target="_blank" rel="noopener" onclick="event.stopPropagation()">📥 ${p}下载</a>` : `<span class="card-dl-btn no-url">${p} (暂无)</span>`).join(' ') : ''}
+          ${g.downloads && Object.keys(g.downloads).length > 0 ? Object.keys(g.downloads).map(p => g.downloads[p] ? `<a class="card-dl-btn" href="${g.downloads[p]}" target="_blank" rel="noopener" onclick="event.stopPropagation()">📥 ${p}下载${getStorageLabel(g.downloads[p]) ? ' (' + getStorageLabel(g.downloads[p]) + ')' : ''}</a>` : `<span class="card-dl-btn no-url">${p} (暂无)</span>`).join(' ') : ''}
+          ${g.downloadNote ? `<span style="font-size:0.68rem;color:var(--pink-light);width:100%;margin-top:4px;">${g.downloadNote}</span>` : ''}
         </div>
         <div class="card-footer">
           <span>🛠 ${g.engine}</span>
@@ -1507,7 +1525,8 @@ function openModal(g) {
     ${g.downloads && Object.keys(g.downloads).some(k => g.downloads[k]) ? `
     <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;padding:16px;background:rgba(244,114,182,0.06);border-radius:12px;border:1px solid rgba(244,114,182,0.15);">
       <span style="font-size:0.9rem;color:var(--pink-light);font-weight:600;width:100%;margin-bottom:4px;">🔗 下载链接</span>
-      ${Object.keys(g.downloads).map(p => g.downloads[p] ? `<a href="${g.downloads[p]}" class="btn btn-primary" style="font-size:0.82rem;padding:8px 18px;" download>📥 ${p} 下载</a>` : `<span class="btn btn-outline" style="font-size:0.82rem;padding:8px 18px;cursor:default;opacity:0.5;">${p} 下载 (暂无)</span>`).join('')}
+      ${Object.keys(g.downloads).map(p => g.downloads[p] ? `<a href="${g.downloads[p]}" class="btn btn-primary" style="font-size:0.82rem;padding:8px 18px;" download>📥 ${p} 下载${getStorageLabel(g.downloads[p]) ? ' (' + getStorageLabel(g.downloads[p]) + ')' : ''}</a>` : `<span class="btn btn-outline" style="font-size:0.82rem;padding:8px 18px;cursor:default;opacity:0.5;">${p} 下载 (暂无)</span>`).join('')}
+      ${g.downloadNote ? `<span style="font-size:0.78rem;color:var(--pink-light);width:100%;margin-top:2px;">${g.downloadNote}</span>` : ''}
     </div>
     ` : ''}
     <div class="desc-full">${renderDescWithImages(g.descFull, g.screenshots)}</div>
