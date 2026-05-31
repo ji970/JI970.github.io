@@ -1,0 +1,9 @@
+# https://ji970.github.io/robots.txt
+Sitemap: https://ji970.github.io/sitemap.xml
+
+User-agent: Baiduspider
+Disallow: /
+
+User-agent: *
+Allow: /
+Disallow: /images/

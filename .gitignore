@@ -4,6 +4,8 @@
 # 空文本文件
 *.txt
 !CNAME
+!robots.txt
+!316bc70ddb264159acd4133a810ee313.txt
 
 # 临时文件
 新建文件夹/
